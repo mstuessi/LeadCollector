@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.light.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.color.green.css" />
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/fileapi.js"></script>
+        <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.2.js"></script>
+        <title>AMAG Leaderfassung</title>
+        
+        <style>
+            
+        </style>
+        
+        <script type="text/javascript">
+            // Command to quick read the file through the console
+            // readText("vw.json", function(textRead){console.log(textRead);});
+            $(document).ready(function() {
+                              // This attribute defines whether the DOM of the vehicledata page has been initialized
+                              vehicledataDOMinitialized = false;
+                              
+                              // Get the campaigns and vehicle informations
+                              downloadCampaigns();
+                              updateAllModels();
+                              
+                              // Prepare the popups
+                              $( "#submitsuccess" ).enhanceWithin().popup();
+                              $( "#submitfailure" ).enhanceWithin().popup();
+                              $( "#submitsuccess, #submitfailure" ).bind({
+                                                                         popupafterclose: function(event, ui) {
+                                                                         $.mobile.navigate("#vehicledata");
+                                                                         }
+                                                                         });
+                              
+                              // Update the campaigns and vehicle information if the button was clicked
+                              $("#updatevalues").click(function() {
+                                                       downloadCampaigns();
+                                                       updateAllModels();
+                                                       });
+                              
+                              // Disable the retransmit button
+                              $("#retransmit").hide();
+                              
+                              // Check if there are failed submissions
+                              // Calling the function without the eventlistener wouldn't have any effect, probably because the fileapi.js is not ready at this point
+                              document.addEventListener("deviceready", function(){
+                                                        checkForFailedSubmissions();
+                                                        }, false);
+                              
+                              // If the checkbox for testdrive or orderbrochures was clicked, toggle the value of the hidden input
+                              $(".type").click(function() {
+                                               if($(this).prop('checked')) {
+                                               $("input[name=" + this.id + "]").val("true");
+                                               } else {
+                                               $("input[name=" + this.id + "]").val("false");
+                                               }
+                                               });
+                              
+                              // Submit the failed leads
+                              $("#retransmit").click(function() {
+                                                     // Show loading gif
+                                                     $.mobile.loading('show', { theme: "b", text: "", textonly: false});
+                                                     
+                                                     readText("failedsubmissions.json", function(textRead) {
+                                                              // Remove the last new line character, then split it by new lines
+                                                              failedLeads = textRead.replace(/^\s+|\s+$/g, '').split("\n");
+                                                              
+                                                              // Create the arrays for the successfull and failed submits
+                                                              var failures = [];
+                                                              var successes = [];
+                                                              
+                                                              // Try to submit each lead again
+                                                              $.each(failedLeads, function() {
+                                                                     data = this;
+                                                                     $.ajax({
+                                                                            type: "POST",
+                                                                            async: false,
+                                                                            data: String(data), // For some reason, "this" returns an array of characters, not the complete string. "String(this)" solves that problem
+                                                                            url: "http://leads.amag.car.web/api/lead/submit/index.php",
+                                                                            success: function(response) {
+                                                                            // If the submission was successfull, assign it to the array successes
+                                                                            successes.push(String(data));
+                                                                            },
+                                                                            error: function(response) {
+                                                                            // If the submission has failed, assign it to the array failures
+                                                                            failures.push(String(data));
+                                                                            }
+                                                                            });
+                                                                     })
+                                                              
+                                                              // Iterate through each failure and create the string to write in to the file
+                                                              failuresString = "";
+                                                              $.each(failures, function() {
+                                                                     failuresString = failuresString + this + "\n";
+                                                                     });
+                                                              
+                                                              // Iterate through each success and create the string to write in to the file
+                                                              successesString = "";
+                                                              $.each(successes, function() {
+                                                                     successesString = successesString + this + "\n";
+                                                                     });
+                                                              
+                                                              // Write the failures
+                                                              saveText(failuresString, "failedsubmissions.json", function() {
+                                                                       
+                                                                       });
+                                                              
+                                                              // Write the successes
+                                                              appendText(successesString, "successfullsubmissions.json", function() {
+                                                                         
+                                                                         });
+                                                              
+                                                              checkForFailedSubmissions();
+                                                              });
+                                                     })
+                              
+                              // Submit the lead before the optional information mask
+                              $("#submitminimumleadbutton").click(function() {
+                                                                  // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
+                                                                  $.each($("#vehicleform").find("input[type=hidden]"), function() {
+                                                                         $("#customerform").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                                                                         });
+                                                                  
+                                                                  $.each($("#vehicleform").find("input[type=checkbox]:checked"), function() {
+                                                                         $("#customerform").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                                                                         })
+                                                                  
+                                                                  // Serialize the form and send it to the server
+                                                                  $.ajax({
+                                                                         type: "POST",
+                                                                         async: false,
+                                                                         data: $("#customerform").serialize(),
+                                                                         timeout: 3000,
+                                                                         url: "http://leads.amag.car.web/api/lead/submit/index.php",
+                                                                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                                                                         complete: function() { $.mobile.loading( 'hide')},
+                                                                         success: function(response) {
+                                                                         // For logging purposes, write the lead into a file
+                                                                         appendText($("#customerform").serialize() + "\n", "successfullsubmissions.json", function() {
+                                                                                    
+                                                                                    });
+                                                                         
+                                                                         $("#submitsuccess").popup('open');
+                                                                         },
+                                                                         error: function(response) {
+                                                                         // If submitting the lead failed, write it to a file for later submission
+                                                                         appendText($("#customerform").serialize() + "\n", "failedsubmissions.json", function() {
+                                                                                    
+                                                                                    });
+                                                                         
+                                                                         $("#submitfailure").popup('open');
+                                                                         }
+                                                                         });
+                                                                  
+                                                                  // Now remove the appended inputs so they don't mix up with the next lead
+                                                                  $(".appendedInput").remove();
+                                                                  
+                                                                  $("#customerform")[0].reset();
+                                                                  $("#vehicleform")[0].reset();
+                                                                  });
+                              
+                              // Submit the lead from the optional information mask
+                              // Do something
+                              
+                              // If the brand has been changed, change the models on the vehicledata page
+                              // If the DOM of the vehiclepage has not been initialized, create a one time event.
+                              // If it already was initialized, immediately update the models
+                              $('input[name="brand"]:radio').change(function() {
+                                                                    if(vehicledataDOMinitialized) {
+                                                                    setModels($('input[name=brand]:checked').val());
+                                                                    } else {
+                                                                    $(document).one("pageshow", "#vehicledata", function(event) {
+                                                                                    setModels($('input[name=brand]:checked').val());
+                                                                                    vehicledataDOMinitialized = true;
+                                                                                    });
+                                                                    }
+                                                                    })
+                              })
+                              
+                              // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
+                              function updateCampaigns(campaigns) {
+                                  // Delete all existing campaigns
+                                  $('#campaignselection').controlgroup("container").empty();
+                                  
+                                  // Creat the radio buttons
+                                  $.each(campaigns, function() {
+                                         $('#campaignselection').controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode[]" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
+                                         })
+                                         
+                                         // A refresh method has to be called, to make jQuery Mobile aware of the changes
+                                         $("#campaignselection").enhanceWithin().controlgroup("refresh");
+                              }
+        
+        // Download the campaigns
+        function downloadCampaigns() {
+            $.ajax({
+                   type: "GET",
+                   dataType: "json",
+                   url: 'http://leads.amag.car.web/api/campaigns',
+                   timeout: 3000,
+                   beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                   complete: function() { $.mobile.loading( 'hide')},
+                   success: function(response) {
+                   // Parse the JSON object as a string so it can be saved into the file
+                   saveText(JSON.stringify(response), "campaigns.json", function() {
+                            // Do something when the file was written?
+                            });
+                   
+                   updateCampaigns(response);
+                   },
+                   error: function(response) {
+                   // If there was an error while getting the campaigns from the server, try to load the campaigns from the local file
+                   readText("campaigns.json", function(textRead) {
+                            var campaigns = jQuery.parseJSON(textRead);
+                            updateCampaigns(campaigns);
+                            })
+                   }
+                   })
+        }
+        
+        // Set the vehicles according to the brand
+        function setModels(brand) {
+            selectedBrand = null;
+            
+            switch(brand) {
+                case "vw":
+                selectedBrand = vw;
+                break;
+                case "audi":
+                selectedBrand = audi;
+                break;
+                case "seat":
+                selectedBrand = seat;
+                break;
+                case "skoda":
+                selectedBrand = skoda;
+                break;
+                case "vwnf":
+                selectedBrand = vwnf;
+                break;
+            }
+            
+            $(".brandlogo").attr("src", "img/logos/" + brand + ".png");
+            
+            $("#vehicleselection").controlgroup("container").empty();
+            
+            $.each(selectedBrand, function() {
+                   $("#vehicleselection").controlgroup("container").append('<label for="' + this.modelcode + '"><input type="checkbox" name="options" id="' + this.modelcode + '" value="' + this.modelcode + '" />'+ this.label_de + '</label>');
+                   })
+                   
+                   $("#vehicleselection").enhanceWithin().controlgroup("refresh");
+        }
+        
+        // This function checks if there still are failed submissions and shows the retransmit button accordingly
+        function checkForFailedSubmissions() {
+            readText("failedsubmissions.json", function(textRead) {
+                     failedSubmissions = textRead;
+                     
+                     if(failedSubmissions.trim() == "") {
+                     $("#retransmit").hide();
+                     } else {
+                     $("#retransmit").show();
+                     }
+                     })
+                     
+                     $.mobile.loading('hide');
+        }
+        
+        // Update all models
+        function updateAllModels() {
+            updateVWModels();
+            updateAudiModels();
+            updateSeatModels();
+            updateSkodaModels();
+            updateVWNFModels();
+        }
+        
+        // Get all VW models
+        function updateVWModels() {
+            $.ajax({
+                   type: "GET",
+                   dataType: "json",
+                   url: 'http://leads.amag.car.web/api/vehicles/vw',
+                   timeout: 3000,
+                   beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                   complete: function() { $.mobile.loading( 'hide')},
+                   success: function(response) {
+                   saveText(JSON.stringify(response), "vw.json", function() {
+                            // Do something when the file was written?
+                            })
+                   
+                   vw = response;
+                   },
+                   error: function(response) {
+                   readText("vw.json", function(textRead) {
+                            jQuery.parseJSON(textRead);
+                            vw = jQuery.parseJSON(textRead);
+                            })
+                   }
+                   })
+        }
+        
+        // Get all Audi models
+        function updateAudiModels() {
+            $.ajax({
+                   type: "GET",
+                   dataType: "json",
+                   url: 'http://leads.amag.car.web/api/vehicles/audi',
+                   timeout: 3000,
+                   beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                   complete: function() { $.mobile.loading( 'hide')},
+                   success: function(response) {
+                   saveText(JSON.stringify(response), "audi.json", function() {
+                            // Do something when the file was written?
+                            })
+                   
+                   audi = response;
+                   },
+                   error: function(response) {
+                   readText("audi.json", function(textRead) {
+                            audi = jQuery.parseJSON(textRead);
+                            })
+                   }
+                   })
+        }
+        
+        // Get all Seat models
+        function updateSeatModels() {
+            $.ajax({
+                   type: "GET",
+                   dataType: "json",
+                   url: "http://leads.amag.car.web/api/vehicles/seat",
+                   timeout: 3000,
+                   beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                   complete: function() { $.mobile.loading( 'hide')},
+                   success: function(response) {
+                   saveText(JSON.stringify(response), "seat.json", function() {
+                            // Do something when the file was written?
+                            })
+                   
+                   seat = response;
+                   },
+                   error: function(response) {
+                   readText("seat", function(textRead) {
+                            seat = jQuery.parseJSON(textRead);
+                            })
+                   }
+                   })
+        }
+        
+        // Get all Skoda models
+        function updateSkodaModels() {
+            $.ajax({
+                   type: "GET",
+                   dataType: "json",
+                   url: "http://leads.amag.car.web/api/vehicles/skoda",
+                   timeout: 3000,
+                   beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                   complete: function() { $.mobile.loading( 'hide')},
+                   success: function(response) {
+                   saveText(JSON.stringify(response), "skoda.json", function() {
+                            // Do something when the file was written?
+                            })
+                   
+                   skoda = response;
+                   },
+                   error: function(response) {
+                   readText("skoda.json", function(textRead) {
+                            skoda = jQuery.parseJSON(textRead);
+                            })
+                   }
+                   })
+        }
+        
+        // Get all VWNF models
+        function updateVWNFModels() {
+            $.ajax({
+                   type: "GET",
+                   dataType: "json",
+                   url: "http://leads.amag.car.web/api/vehicles/vwnf",
+                   timeout: 3000,
+                   beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                   complete: function() { $.mobile.loading( 'hide')},
+                   success: function(response) {
+                   saveText(JSON.stringify(response), "vwnf.json", function() {
+                            // Do something when the file was written?
+                            })
+                   
+                   vwnf = response;
+                   },
+                   error: function(response) {
+                   readText("vwnf.json", function(textRead) {
+                            vwnf = jQuery.parseJSON(textRead);
+                            })
+                   }
+                   })
+        }
+        </script>
+    </head>
+    <body>
+        <!-- GRUNDEINSTELLUNGEN -->
+        <div data-role="page" id="startscreen" data-theme='b'>
+            <div data-role="header" data-position='fixed' data-tap-toggle='false' data-theme='b'>
+                <h1>Marken- &amp; Kampagnenauswahl</h1>
+            </div>
+            
+            <div role="main" class="ui-content">
+                <form>
+                    <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: center">
+                        <input type="radio" name="brand" id="vw" value="vw" />
+                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></img></label>
+                        <input type="radio" name="brand" id="audi" value="audi" />
+                        <label for="audi"><img src="img/logos/audi.new.png" width="128px" ></label>
+                        <input type="radio" name="brand" id="seat" value="seat" />
+                        <label for="seat"><img src="img/logos/seat.new.png" width="128px"></label>
+                        <input type="radio" name="brand" id="skoda" value="skoda" />
+                        <label for="skoda"><img src="img/logos/skoda.new.png" width="128px"></label>
+                        <input type="radio" name="brand" id="vwnf" value="vwnf">
+                        <label for="vwnf"><img src="img/logos/vwnf.new.png" width="128px"></label>
+                    </fieldset>
+                    
+                    <div data-role="content">
+                        <div data-role="controlgroup" id="campaignselection">
+                            <!-- The campaigns from the server or the file will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-a ui-responsive">
+                        <div class="ui-block-a"><input type="button" id="updatevalues" class="ui-btn ui-corner-all" value="Modelle &amp; Kampagnen aktualisieren"></div>
+                        <div class="ui-block-b"><a href="#vehicledata" class="ui-btn ui-corner-all">Werte speichern</a></div>
+                    </div>
+                    
+                    <div class="ui-grid-solo ui-responsive">
+                        <div class="ui-block-a"><a href="#vehicledata" class="ui-btn ui-corner-all">Fehlgeschlagene Leads versenden3</a></div>
+                    </div>
+                </form>
+            </div>
+            
+            <div data-role="footer" data-position="fixed">
+                <h4><img src="img/logos/amag.gray.png"></h4>
+            </div>
+        </div>
+        
+        <!-- FAHRZEUGDATEN -->
+        <div data-role="page" id="vehicledata">
+            <div data-role="header">
+                <h1>Interessentendaten</h1>
+                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear"></a>
+                <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back"></a>
+            </div>
+            
+            <div role="main" class="ui-content">
+                <form id="vehicleform">
+                    <fieldset data-role="controlgroup" data-type="horizontal">
+                        <input type="checkbox" id="testdrive" class="type">
+                        <label for="testdrive">Probefahrt</label>
+                        <input type="checkbox" id="orderbrochures" class="type">
+                        <label for="orderbrochures">Prospekte</label>
+                    </fieldset>
+                    
+                    <div data-role="content">
+                        <div data-role="controlgroup" id="vehicleselection">
+                            <!-- The campaigns from the server or the file will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a"><a href="#customerdata" class="ui-btn ui-corner-all">Interessentendaten</a></div>
+                        <input type="hidden" name="testdrive" value="false">
+                        <input type="hidden" name="orderbrochures" value="false">
+                    </div>
+                </form>
+            </div>
+            
+            <div data-role="footer" data-position="fixed">
+                <h4><img src="img/logos/amag.gray.png"></h4>
+            </div>
+        </div>
+        
+        <!-- INTERESSENTENDATEN -->
+        <div data-role="page" id="customerdata">
+            <div data-role="header">
+                <h1>Interessentendaten</h1>
+                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
+                <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Zurück</a>
+            </div>
+            
+            <div role="main" class="ui-content">
+                <form id="customerform">
+                    <fieldset data-role="controlgroup" data-type="horizontal">
+                        <input type="radio" name="salutation" id="m" value="m">
+                        <label for="m">Herr</label>
+                        <input type="radio" name="salutation" id="f" value="f">
+                        <label for="f">Frau</label>
+                        <input type="radio" name="salutation" id="company" value="company">
+                        <label for="company">Firma</label>
+                    </fieldset>
+                    
+                    <div class="ui-grid-a ui-responsive">
+                        <div class="ui-block-a"><input type="text" name="surname" id="surname" value="" placeholder="Vorname"></div>
+                        <div class="ui-block-b"><input type="text" name="lastname" id="lastname" value="" placeholder="Nachname"></div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 90%;"><input type="text" name="address" id="address" value="" placeholder="Adresse"></div>
+                        <div class="ui-block-b" style="width: 10%;"><input type="text" name="address-number" id="address-number" value="" placeholder="Nr."></div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 20%;"><input type="text" name="zip" id="zip" value="" placeholder="PLZ"></div>
+                        <div class="ui-block-b" style="width: 80%;"><input type="text" name="city" id="city" value="" placeholder="Ort"></div>
+                    </div>
+                    
+                    <div class="ui-field-contain">
+                        <select name="country" id="country">
+                            <option value="ch">Schweiz</option>
+                            <option value="de">Deutschland</option>
+                            <option value="fr">Frankreich</option>
+                            <option value="it">Italien</option>
+                        </select>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a"><input type="text" name="phone" id="phone" value="" placeholder="Telefon"></div>
+                        <div class="ui-block-b"><input type="text" name="email" id="email" value="" placeholder="Email"></div>
+                    </div>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a"><textarea name="comments" id="comments" value="" placeholder="Bemerkungen"></textarea></div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a"><a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all">Absenden</a></div>
+                        <div class="ui-block-b"><a href="#optionalinformation" id="optionalinformation" class="ui-btn ui-corner-all">Optionale Angaben</a></div>
+                    </div>
+                </form>
+            </div>
+            
+            <div data-role="footer" data-position="fixed">
+                <h4><img src="img/logos/amag.gray.png"></h4>
+            </div>
+        </div>
+        
+        <!-- OPTIONALE ANGABEN -->
+        <div data-role="page" id="optionaldata">
+            <div data-role="header">
+                <h1>Interessentendaten</h1>
+                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
+                <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Zurück</a>
+            </div>
+            
+            <div role="main" class="ui-content">
+                <form id="optionalform">
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 10%"><input type="text" name="age" id="age" value="" placeholder="Alter"></div>
+                        <div class="ui-block-b" style="width: 90%">
+                            <div class="ui-field-contain">
+                                <select name="select-native-1" id="select-native-1" data-mini="true">
+                                    <option value="1">The 1st Option</option>
+                                    <option value="2">The 2nd Option</option>
+                                    <option value="3">The 3rd Option</option>
+                                    <option value="4">The 4th Option</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- HÄNDLERSUCHE -->
+        <!-- Needs much, much work... -->
+        <!--
+         <div data-role="page" id="dealersearch">
+         <div data-role="header">
+         <h1>Händlersuche</h1>
+         <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
+         <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Zurück</a>
+         </div>
+         
+         <div role="main" class="ui-content ui-content-list">
+         <div id="list-canvas">
+         <ul id="list-results" data-role="listview">
+         
+         </ul>
+         </div>
+         </div>
+         </div>-->
+        
+        <!-- POPUP: ERFOLGSMELDUNG -->
+        <div id="submitsuccess" data-theme="a" class="ui-content">
+            <div data-role="content">
+                <h2>Versand erfolgreich</h2>
+                <p>Die Daten konnten erfolgreich versendet werden.</p>
+            </div>
+        </div>
+            
+        <!-- POPUP: FEHLERMELDUNG -->
+        <div id="submitfailure" data-theme="a" class="ui-content">
+            <div data-role="content">
+                <h2>Versand fehlgeschlagen</h2>
+                <p>Beim Versand gab es ein Problem. Die Anfrage wurde allerdings gespeichert und kann später übermittelt werden.</p>
+            </div>
+        </div>
+    </body>
+</html>
