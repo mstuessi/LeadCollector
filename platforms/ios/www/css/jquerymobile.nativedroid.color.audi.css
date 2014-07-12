@@ -3,17 +3,17 @@
  * GREEN:
  * 
  * COLOR GUIDE:
- * 	Light: #b6db49
- *  Dark: #99cc00;
- *
+ * 	Light: #AA142D rgba(182,219,73
+ *  Dark: #99cc00
+ *  Hintergrund der Elemente: #e2f0b6
  */
 
 .ui-bar-b,.ui-page-theme-b .ui-dialog-contain .ui-title {
-	border-bottom: 2px solid #B6DB49;
+	border-bottom: 2px solid #AA142D;
 }
 
 .ui-btn-down-b .ui-btn-inner,.ui-btn-down-b .ui-btn-text .ui-link-inherit,.ui-listview .ui-btn-hover-b,.ui-input-search.ui-page-theme-b {
-	background-color: #B6DB49;
+	background-color: #AA142D;
 }
 
 .ui-page-theme-b form .ui-btn-down-b,.ui-page-theme-b form .ui-mini.ui-checkbox-on,.ui-page-theme-b form .ui-mini.ui-radio-on {
@@ -21,7 +21,7 @@
 }
 
 .ui-page-theme-b .ui-btn:hover, html .ui-bar-b .ui-btn:hover, html .ui-page-theme-b .ui-btn:hover, html body .ui-group-theme-b .ui-btn:hover, html head+body .ui-btn.ui-btn-b:hover {
-    background-color: #CC0033;
+    background-color: #e2f0b6;
 }
 .ui-page-theme-b .ui-btn:active, html .ui-bar-b .ui-btn:active, html .ui-page-theme-b .ui-btn:active, html body .ui-group-theme-b .ui-btn:active, html head+body .ui-btn.ui-btn-b:active,
 .ui-page-theme-b .ui-btn.ui-btn-active, html .ui-bar-b .ui-btn.ui-btn-active, html .ui-page-theme-b .ui-btn.ui-btn-active, html body .ui-group-theme-b .ui-btn.ui-btn-active, html head+body .ui-btn.ui-btn-b.ui-btn-active, .ui-page-theme-b .ui-checkbox-on:after, html .ui-bar-b .ui-checkbox-on:after, html .ui-page-theme-b .ui-checkbox-on:after, html body .ui-group-theme-b .ui-checkbox-on:after, .ui-btn.ui-checkbox-on.ui-btn-b:after, .ui-page-theme-b .ui-flipswitch-active, html .ui-bar-b .ui-flipswitch-active, html .ui-page-theme-b .ui-flipswitch-active, html body .ui-group-theme-b .ui-flipswitch-active, html body .ui-flipswitch.ui-bar-b.ui-flipswitch-active, .ui-page-theme-b .ui-slider-track .ui-btn-active, html .ui-bar-b .ui-slider-track .ui-btn-active, html .ui-page-theme-b .ui-slider-track .ui-btn-active, html body .ui-group-theme-b .ui-slider-track .ui-btn-active, html body div.ui-slider-track.ui-page-theme-b .ui-btn-active,
@@ -71,7 +71,7 @@
 
 .ui-page-theme-b .table-stroke tr:nth-child(even) .ui-link,
 .ui-page-theme-b a, html .ui-bar-b a, html .ui-page-theme-b a, html body .ui-group-theme-b a  {
-	color: #b6db49;
+	color: #AA142D;
 }
 
 
@@ -104,7 +104,7 @@
 }
 
 .ui-page-theme-b .ui-flipswitch.ui-bar-inherit.ui-flipswitch-active .ui-flipswitch-on:hover {
-	background-color: #B6DB49;
+	background-color: #AA142D;
 	color: #669900;
 }
 
