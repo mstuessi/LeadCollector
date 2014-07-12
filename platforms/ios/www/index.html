@@ -11,7 +11,7 @@
         <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />
         <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.css" />
         <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.light.css" />
-        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.color.green.css" />
+        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.color.green.css" id="brandstyle" />
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/fileapi.js"></script>
         <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
@@ -269,7 +269,7 @@
                         break;
                 }
                 
-                $(".brandlogo").attr("src", "img/logos/" + brand + ".png");
+                //$(".brandlogo").attr("src", "img/logos/" + brand + ".png");
                 
                 $("#vehicleselection").controlgroup("container").empty();
                 
@@ -475,7 +475,7 @@
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
-                <img class="ui-btn-left brandlogo" width="200px;">
+                <!--<img class="ui-btn-left brandlogo" width="200px;">-->
             </div>
             
             <div role="main" class="ui-content">
