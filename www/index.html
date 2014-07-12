@@ -33,14 +33,29 @@
                 downloadCampaigns();
                 updateAllModels();
                 
-                $( "#submitsuccess" ).enhanceWithin().popup();
-                $( "#submitfailure" ).enhanceWithin().popup();
+                // Prepare the popups
+                $("#submitsuccess").enhanceWithin().popup();
+                $("#submitfailure").enhanceWithin().popup();
+                $("#submitsuccess, #submitfailure").bind({
+                    popupafterclose: function(event, ui) {
+                        $.mobile.navigate("#vehicledata");
+                    }
+                });
                 
                 // Update the campaigns and vehicle information if the button was clicked
                 $("#updatevalues").click(function() {
                     downloadCampaigns();
                     updateAllModels();
-                })
+                });
+                
+                // Disable the retransmit button
+                $("#retransmit").hide();
+                
+                // Check if there are failed submissions
+                // Calling the function without the eventlistener wouldn't have any effect, probably because the fileapi.js is not ready at this point
+                document.addEventListener("deviceready", function(){
+                    checkForFailedSubmissions();
+                }, false);
                 
                 // If the checkbox for testdrive or orderbrochures was clicked, toggle the value of the hidden input
                 $(".type").click(function() {
@@ -49,24 +64,86 @@
                     } else {
                         $("input[name=" + this.id + "]").val("false");
                     }
-                })
+                });
                 
                 // Submit the failed leads
-                
+                $("#retransmit").click(function() {
+                    // Show loading gif
+                    $.mobile.loading('show', { theme: "b", text: "", textonly: false});
+                    
+                    readText("failedsubmissions.json", function(textRead) {
+                        // Remove the last new line character, then split it by new lines
+                        failedLeads = textRead.replace(/^\s+|\s+$/g, '').split("\n");
+                        
+                        // Create the arrays for the successfull and failed submits
+                        var failures = [];
+                        var successes = [];
+                        
+                        // Try to submit each lead again
+                        $.each(failedLeads, function() {
+                            data = this;
+                            $.ajax({
+                               type: "POST",
+                               async: false,
+                               data: String(data), // For some reason, "this" returns an array of characters, not the complete string. "String(this)" solves that problem
+                               url: "http://leads.amag.car.web/api/lead/submit/index.php",
+                               success: function(response) {
+                                   // If the submission was successfull, assign it to the array successes
+                                   successes.push(String(data));
+                               },
+                               error: function(response) {
+                                   // If the submission has failed, assign it to the array failures
+                                   failures.push(String(data));
+                               }
+                            });
+                        })
+                        
+                        // Iterate through each failure and create the string to write in to the file
+                        failuresString = "";
+                        $.each(failures, function() {
+                            failuresString = failuresString + this + "\n";
+                        });
+                        
+                        // Iterate through each success and create the string to write in to the file
+                        successesString = "";
+                        $.each(successes, function() {
+                            successesString = successesString + this + "\n";
+                        });
+                        
+                        // Write the failures
+                        saveText(failuresString, "failedsubmissions.json", function() {
+                            
+                        });
+                        
+                        // Write the successes
+                        appendText(successesString, "successfullsubmissions.json", function() {
+                            
+                        });
+                        
+                        checkForFailedSubmissions();
+                    });
+                })
                 
                 // Submit the lead before the optional information mask
                 $("#submitminimumleadbutton").click(function() {
                     // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
-                    $.each($("#vehicleform").find("input"), function() {
+                    $.each($("#vehicleform").find("input[type=hidden]"), function() {
                         $("#customerform").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
                     });
+                    
+                    $.each($("#vehicleform").find("input[type=checkbox]:checked"), function() {
+                        $("#customerform").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                    })
                     
                     // Serialize the form and send it to the server
                     $.ajax({
                         type: "POST",
                         async: false,
                         data: $("#customerform").serialize(),
+                        timeout: 3000,
                         url: "http://leads.amag.car.web/api/lead/submit/index.php",
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
                         success: function(response) {
                             // For logging purposes, write the lead into a file
                             appendText($("#customerform").serialize() + "\n", "successfullsubmissions.json", function() {
@@ -89,6 +166,7 @@
                     $(".appendedInput").remove();
                     
                     $("#customerform")[0].reset();
+                    $("#vehicleform")[0].reset();
                 });
                 
                 // Submit the lead from the optional information mask
@@ -97,7 +175,26 @@
                 // If the brand has been changed, change the models on the vehicledata page
                 // If the DOM of the vehiclepage has not been initialized, create a one time event.
                 // If it already was initialized, immediately update the models
+                // Additionally change the design of the application to the according brand-style
                 $('input[name="brand"]:radio').change(function() {
+                    switch(this.id) {
+                        case "vw":
+                            
+                            break;
+                        case "audi":
+                            $("#brandstyle").attr("href", "css/jquerymobile.nativedroid.color.audi.css");
+                            break;
+                        case "seat":
+                            
+                            break;
+                        case "skoda":
+                            
+                            break;
+                        case "vwnf":
+                            
+                            break;
+                    }
+                    
                     if(vehicledataDOMinitialized) {
                         setModels($('input[name=brand]:checked').val());
                     } else {
@@ -116,7 +213,7 @@
                 
                 // Creat the radio buttons
                 $.each(campaigns, function() {
-                    $('#campaignselection').controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
+                    $('#campaignselection').controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode[]" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 // A refresh method has to be called, to make jQuery Mobile aware of the changes
@@ -130,6 +227,8 @@
                     dataType: "json",
                     url: 'http://leads.amag.car.web/api/campaigns',
                     timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
                     success: function(response) {
                         // Parse the JSON object as a string so it can be saved into the file
                         saveText(JSON.stringify(response), "campaigns.json", function() {
@@ -175,10 +274,25 @@
                 $("#vehicleselection").controlgroup("container").empty();
                 
                 $.each(selectedBrand, function() {
-                    $("#vehicleselection").controlgroup("container").append('<label for="' + this.modelcode + '"><input type="checkbox" name="campaigncode" id="' + this.modelcode + '" value="' + this.modelcode + '" />'+ this.label_de + '</label>');
+                    $("#vehicleselection").controlgroup("container").append('<label for="' + this.modelcode + '"><input type="checkbox" name="options" id="' + this.modelcode + '" value="' + this.modelcode + '" />'+ this.label_de + '</label>');
                 })
                 
                 $("#vehicleselection").enhanceWithin().controlgroup("refresh");
+            }
+        
+            // This function checks if there still are failed submissions and shows the retransmit button accordingly
+            function checkForFailedSubmissions() {
+                readText("failedsubmissions.json", function(textRead) {
+                    failedSubmissions = textRead;
+                    
+                    if(failedSubmissions.trim() == "") {
+                        $("#retransmit").hide();
+                    } else {
+                        $("#retransmit").show();
+                    }
+                })
+                
+                $.mobile.loading('hide');
             }
         
             // Update all models
@@ -197,6 +311,8 @@
                     dataType: "json",
                     url: 'http://leads.amag.car.web/api/vehicles/vw',
                     timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
                     success: function(response) {
                         saveText(JSON.stringify(response), "vw.json", function() {
                             // Do something when the file was written?
@@ -220,6 +336,8 @@
                     dataType: "json",
                     url: 'http://leads.amag.car.web/api/vehicles/audi',
                     timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
                     success: function(response) {
                         saveText(JSON.stringify(response), "audi.json", function() {
                             // Do something when the file was written?
@@ -242,6 +360,8 @@
                     dataType: "json",
                     url: "http://leads.amag.car.web/api/vehicles/seat",
                     timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
                     success: function(response) {
                         saveText(JSON.stringify(response), "seat.json", function() {
                             // Do something when the file was written?
@@ -264,6 +384,8 @@
                     dataType: "json",
                     url: "http://leads.amag.car.web/api/vehicles/skoda",
                     timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
                     success: function(response) {
                         saveText(JSON.stringify(response), "skoda.json", function() {
                             // Do something when the file was written?
@@ -286,6 +408,8 @@
                     dataType: "json",
                     url: "http://leads.amag.car.web/api/vehicles/vwnf",
                     timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
                     success: function(response) {
                         saveText(JSON.stringify(response), "vwnf.json", function() {
                             // Do something when the file was written?
