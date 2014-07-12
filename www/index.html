@@ -269,7 +269,7 @@
                         break;
                 }
                 
-                $(".brandlogo").attr("src", "img/logos/" + brand + ".png");
+                //$(".brandlogo").attr("src", "img/logos/" + brand + ".png");
                 
                 $("#vehicleselection").controlgroup("container").empty();
                 
@@ -428,8 +428,8 @@
     </head>
     <body>
         <!-- GRUNDEINSTELLUNGEN -->
-        <div data-role="page" id="startscreen" data-theme='b'>
-            <div data-role="header" data-position='fixed' data-tap-toggle='false' data-theme='b'>
+        <div data-role="page" id="startscreen" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Marken- &amp; Kampagnenauswahl</h1>
             </div>
             
@@ -437,15 +437,15 @@
                 <form>
                     <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: center">
                         <input type="radio" name="brand" id="vw" value="vw" />
-                        <label for="vw"><img src="img/logos/vw.png" width="128px"></img></label>
+                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></img></label>
                         <input type="radio" name="brand" id="audi" value="audi" />
-                        <label for="audi"><img src="img/logos/audi.png" width="128px" ></label>
+                        <label for="audi"><img src="img/logos/audi.new.png" width="128px" ></label>
                         <input type="radio" name="brand" id="seat" value="seat" />
-                        <label for="seat"><img src="img/logos/seat.png" width="128px"></label>
+                        <label for="seat"><img src="img/logos/seat.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="skoda" value="skoda" />
-                        <label for="skoda"><img src="img/logos/skoda.png" width="128px"></label>
+                        <label for="skoda"><img src="img/logos/skoda.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="vwnf" value="vwnf">
-                        <label for="vwnf"><img src="img/logos/vwnf.png" width="128px"></label>
+                        <label for="vwnf"><img src="img/logos/vwnf.new.png" width="128px"></label>
                     </fieldset>
                     
                     <div data-role="content">
@@ -455,27 +455,27 @@
                     </div>
                     
                     <div class="ui-grid-a ui-responsive">
-                        <div class="ui-block-a"><input type="button" id="updatevalues" class="ui-btn ui-corner-all" value="Modelle &amp; Kampagnen aktualisieren"></div>
+                        <div class="ui-block-a"><a href="#" id="updatevalues" class="ui-btn ui-corner-all">Modelle &amp; Kampagnen aktualisieren</a></div>
                         <div class="ui-block-b"><a href="#vehicledata" class="ui-btn ui-corner-all">Werte speichern</a></div>
                     </div>
                     
                     <div class="ui-grid-solo ui-responsive">
-                        <div class="ui-block-a"><a href="#vehicledata" class="ui-btn ui-corner-all">Fehlgeschlagene Leads versenden3</a></div>
+                        <div class="ui-block-a"><a href="#" id="retransmit" class="ui-btn ui-corner-all">Fehlgeschlagene Leads versenden</a></div>
                     </div>
                 </form>
             </div>
-            
+            <!--
             <div data-role="footer" data-position="fixed">
                 <h4><img src="img/logos/amag.gray.png"></h4>
-            </div>
+            </div>-->
         </div>
         
         <!-- FAHRZEUGDATEN -->
-        <div data-role="page" id="vehicledata">
-            <div data-role="header">
+        <div data-role="page" id="vehicledata" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
-                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
-                <img class="ui-btn-left brandlogo" height="90%">
+                <a href="#startscreen" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
+                <!--<img class="ui-btn-left brandlogo" width="200px;">-->
             </div>
             
             <div role="main" class="ui-content">
@@ -489,7 +489,7 @@
                     
                     <div data-role="content">
                         <div data-role="controlgroup" id="vehicleselection">
-                            <!-- The campaigns from the server or the file will be loaded here -->
+                            <!-- The models from the server or the file will be loaded here -->
                         </div>
                     </div>
                     
@@ -500,18 +500,14 @@
                     </div>
                 </form>
             </div>
-            
-            <div data-role="footer" data-position="fixed">
-                <h4><img src="img/logos/amag.gray.png"></h4>
-            </div>
         </div>
         
         <!-- INTERESSENTENDATEN -->
-        <div data-role="page" id="customerdata">
-            <div data-role="header">
+        <div data-role="page" id="customerdata" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
-                <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Zurück</a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
+                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i></a>
             </div>
             
             <div role="main" class="ui-content">
@@ -549,6 +545,10 @@
                         </select>
                     </div>
                     
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a"><a href="#dealersearch" class="ui-btn ui-corner-all">Händlersuche</a></div>
+                    </div>
+                    
                     <div class="ui-grid-a">
                         <div class="ui-block-a"><input type="text" name="phone" id="phone" value="" placeholder="Telefon"></div>
                         <div class="ui-block-b"><input type="text" name="email" id="email" value="" placeholder="Email"></div>
@@ -560,15 +560,57 @@
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a"><a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all">Absenden</a></div>
-                        <div class="ui-block-b"><a href="#optionalinformation" id="optionalinformation" class="ui-btn ui-corner-all">Optionale Angaben</a></div>
+                        <div class="ui-block-b"><a href="#optionaldata" id="optionalinformation" class="ui-btn ui-corner-all">Optionale Angaben</a></div>
                     </div>
                 </form>
             </div>
+        </div>
+        
+        <!-- OPTIONALE ANGABEN -->
+        <div data-role="page" id="optionaldata" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                <h1>Interessentendaten</h1>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
+                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i></a>
+            </div>
             
-            <div data-role="footer" data-position="fixed">
-                <h4><img src="img/logos/amag.gray.png"></h4>
+            <div role="main" class="ui-content">
+                <form id="optionalform">
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 10%"><input type="text" name="age" id="age" value="" placeholder="Alter"></div>
+                        <div class="ui-block-b" style="width: 90%">
+                            <div class="ui-field-contain">
+                                <select name="select-native-1" id="select-native-1" data-mini="true">
+                                    <option value="1">The 1st Option</option>
+                                    <option value="2">The 2nd Option</option>
+                                    <option value="3">The 3rd Option</option>
+                                    <option value="4">The 4th Option</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+        
+        <!-- HÄNDLERSUCHE -->
+        <!-- Needs much, much work... -->
+        <!--
+        <div data-role="page" id="dealersearch">
+            <div data-role="header">
+                <h1>Händlersuche</h1>
+                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
+                <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Zurück</a>
+            </div>
+            
+            <div role="main" class="ui-content ui-content-list">
+                <div id="list-canvas">
+                    <ul id="list-results" data-role="listview">
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>-->
         
         <!-- POPUP: ERFOLGSMELDUNG -->
         <div id="submitsuccess" data-theme="a" class="ui-content">
