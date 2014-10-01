@@ -8,10 +8,16 @@
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
-        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />
-        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.css" />
+   <!--     <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />-->
+        
+        <link rel="stylesheet" href="css/Marken_neutral_AMAG.css" />
+        <link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css" />
+        
+        
+      <!--  <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.css" />
         <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.light.css" />
-        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.color.green.css" id="brandstyle" />
+        <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.color.green.css" id="brandstyle" />-->
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/fileapi.js"></script>
         <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
@@ -28,6 +34,11 @@
             $(document).ready(function() {
                 // This attribute defines whether the DOM of the vehicledata page has been initialized
                 vehicledataDOMinitialized = false;
+                
+                //Initalizing general Lead Data (Country and DealerData)
+                
+                initializeCommonLeadData();
+                
             
                 // Get the campaigns and vehicle informations
                 downloadCampaigns();
@@ -209,11 +220,11 @@
             // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
             function updateCampaigns(campaigns) {
                 // Delete all existing campaigns
-                $('#campaignselection').controlgroup("container").empty();
+                $("#campaignselection").controlgroup("container").empty();
                 
                 // Creat the radio buttons
                 $.each(campaigns, function() {
-                    $('#campaignselection').controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode[]" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
+                    $("#campaignselection").controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode[]" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 // A refresh method has to be called, to make jQuery Mobile aware of the changes
@@ -424,6 +435,23 @@
                     }
                 })
             }
+        
+            function initializeCommonLeadData() {
+                $(document).one("pageshow", "#customerdata", function(event) {
+                    readText("country.json", function(textRead) {
+                        country = jQuery.parseJSON(textRead);
+                        $('#countries').controlgroup().empty();
+                    
+                        // Create the radio buttons
+                        $.each(country, function() {
+                            $("#countries").controlgroup().append('<a href="#" class="ui-screen-hidden" data-role="button" id="' + this.countrycode + '">' + this.countryname + '</a>');
+                        });
+                
+                        // A refresh method has to be called, to make jQuery Mobile aware of the changes
+                        $("#countries").enhanceWithin().controlgroup("refresh");
+                    });
+                })
+            }
         </script>
     </head>
     <body>
@@ -512,18 +540,38 @@
             
             <div role="main" class="ui-content">
                 <form id="customerform">
-                    <fieldset data-role="controlgroup" data-type="horizontal">
-                        <input type="radio" name="salutation" id="m" value="m">
-                        <label for="m">Herr</label>
-                        <input type="radio" name="salutation" id="f" value="f">
-                        <label for="f">Frau</label>
-                        <input type="radio" name="salutation" id="company" value="company">
-                        <label for="company">Firma</label>
-                    </fieldset>
+                   
+                   <div class="ui-grid-a">
+                       <div class="ui-block-a" style="width: 40%">
+                           <fieldset data-role="controlgroup" data-type="horizontal">
+                                <input type="radio" name="salutation" id="m" value="m">
+                                <label for="m">Herr</label>
+                                <input type="radio" name="salutation" id="f" value="f">
+                                <label for="f">Frau</label>
+                            </fieldset>
+                       </div>
+                       <div class="ui-block-b" style="width: 60%">
+                           <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: right">
+                                <input type="radio" name="lang" id="de" value="de">
+                                <label for="de">Deutsch</label>
+                                <input type="radio" name="lang" id="fr" value="fr">
+                                <label for="fr">Französich</label>
+                                <input type="radio" name="lang" id="it" value="it">
+                                <label for="it">Italienisch</label>
+                                <input type="radio" name="lang" id="en" value="en">
+                                <label for="en">Englisch</label>
+                            </fieldset>
+                       
+                       </div>
+                   </div>
                     
-                    <div class="ui-grid-a ui-responsive">
+                    <div class="ui-grid-a">
                         <div class="ui-block-a"><input type="text" name="surname" id="surname" value="" placeholder="Vorname"></div>
                         <div class="ui-block-b"><input type="text" name="lastname" id="lastname" value="" placeholder="Nachname"></div>
+                    </div>
+                    
+                    <div>
+                        <div><input type="text" name="surname" id="surname" value="" placeholder="Firma"></div>
                     </div>
                     
                     <div class="ui-grid-a">
@@ -536,18 +584,58 @@
                         <div class="ui-block-b" style="width: 80%;"><input type="text" name="city" id="city" value="" placeholder="Ort"></div>
                     </div>
                     
-                    <div class="ui-field-contain">
-                        <select name="country" id="country">
-                            <option value="ch">Schweiz</option>
-                            <option value="de">Deutschland</option>
-                            <option value="fr">Frankreich</option>
-                            <option value="it">Italien</option>
-                        </select>
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a" style="width: 15%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Schweizer Lead:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 15%; margin-top: 2px;">
+                            <fieldset>
+                                <select id="select-based-flipswitch" data-role="flipswitch">
+                                    <option value="leave">Ja</option>
+                                    <option value="arrive">Nein</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="ui-block-c" style="width: 70%;">
+                            <input id="country" name="country" data-type="search" >
+                                <div class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup" data-filter="true" data-input="#country" data-filter-reveal="true" data-enhanced="true" id="countries">
+                                    <!--- Country Data will be inserted here -->
+                                </div>
+                                </div>
+                    </div>
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a" style="width: 15%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Wunschpartner:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 15%; margin-top: 2px;">
+                                <fieldset>
+                                        <select id="select-based-flipswitch" data-role="flipswitch">
+                                            <option value="leave">Nein</option>
+                                            <option value="arrive">Ja</option>
+                                        </select>
+                                </fieldset>
+                        </div>
+                        <div class="ui-block-c" style="width: 70%;">
+                            <input id="pre-rendered-filterable" data-type="search" >
+                                <div
+                                    class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
+                                    data-role="controlgroup"
+                                    data-filter="true"
+                                    data-input="#pre-rendered-filterable_2"
+                                    data-filter-reveal="true"
+                                    data-enhanced="true">
+                                        <div class="ui-controlgroup-controls">
+                                            
+                                        </div>
+                                </div>
+                        </div>
                     </div>
                     
-                    <div class="ui-grid-solo">
+                    
+                 <!--   <div class="ui-grid-solo">
                         <div class="ui-block-a"><a href="#dealersearch" class="ui-btn ui-corner-all">Händlersuche</a></div>
                     </div>
+                  -->
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a"><input type="text" name="phone" id="phone" value="" placeholder="Telefon"></div>
