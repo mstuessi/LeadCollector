@@ -34,11 +34,10 @@
             $(document).ready(function() {
                 // This attribute defines whether the DOM of the vehicledata page has been initialized
                 vehicledataDOMinitialized = false;
+                customerdataDOMinitialized = false;
                 
-                //Initalizing general Lead Data (Country and DealerData)
-                
+                //Initalizing general Lead Data
                 initializeCommonLeadData();
-                
             
                 // Get the campaigns and vehicle informations
                 downloadCampaigns();
@@ -190,19 +189,19 @@
                 $('input[name="brand"]:radio').change(function() {
                     switch(this.id) {
                         case "vw":
-                            
+                            executeBrandUpdate("vw");
                             break;
                         case "audi":
-                            $("#brandstyle").attr("href", "css/jquerymobile.nativedroid.color.audi.css");
+                            executeBrandUpdate("audi");
                             break;
                         case "seat":
-                            
+                            executeBrandUpdate("seat");
                             break;
                         case "skoda":
-                            
+                            executeBrandUpdate("skoda");
                             break;
                         case "vwnf":
-                            
+                            executeBrandUpdate("vwnf");
                             break;
                     }
                     
@@ -280,8 +279,6 @@
                         break;
                 }
                 
-                //$(".brandlogo").attr("src", "img/logos/" + brand + ".png");
-                
                 $("#vehicleselection").controlgroup("container").empty();
                 
                 $.each(selectedBrand, function() {
@@ -289,6 +286,34 @@
                 })
                 
                 $("#vehicleselection").enhanceWithin().controlgroup("refresh");
+            }
+        
+            // Begin the dealers update
+            function executeBrandUpdate(brand) {
+                if(!customerdataDOMinitialized) {
+                    setBrandDealers(brand);
+                } else {
+                    $(document).one("pageshow", "#customerdata", function(event) {
+                        setBrandDealers(brand);
+                        customerdataDOMinitialized = true;
+                    })
+                }
+            }
+        
+            // Set the dealers
+            function setBrandDealers(brand) {
+                readText(brand + "dealers.json", function(textRead) {
+                    dealers = jQuery.parseJSON(textRead);
+                    $("#dealers").controlgroup().empty();
+                    
+                    // Create the radio buttons
+                    $.each(dealers, function() {
+                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealerid + '">' + this.dealername1 + '</a>');
+                    });
+                
+                    // A refresh method has to be called, to make jQuery Mobile aware of the changes
+                    $("#dealers").enhanceWithin().controlgroup("refresh");
+                })
             }
         
             // This function checks if there still are failed submissions and shows the retransmit button accordingly
@@ -436,6 +461,7 @@
                 })
             }
         
+            // This method reads the country information and loads the dealers for each brand into a file
             function initializeCommonLeadData() {
                 $(document).one("pageshow", "#customerdata", function(event) {
                     readText("country.json", function(textRead) {
@@ -444,13 +470,35 @@
                     
                         // Create the radio buttons
                         $.each(country, function() {
-                            $("#countries").controlgroup().append('<a href="#" class="ui-screen-hidden" data-role="button" id="' + this.countrycode + '">' + this.countryname + '</a>');
+                            $("#countries").controlgroup().append('<a href="#" class="countryoption ui-screen-hidden" data-role="button" id="' + this.countrycode + '">' + this.countryname + '</a>');
                         });
                 
                         // A refresh method has to be called, to make jQuery Mobile aware of the changes
                         $("#countries").enhanceWithin().controlgroup("refresh");
                     });
                 })
+                
+                // UNGETESTETER CODE!!! BEI PROBLEMEN AUSKOMMENTIEREN --- BEGINN
+                // Die Ausgabe des Servers entspricht unter Umständen nicht der erwarteten Struktur
+                // Iterate through each brand and save the response into the corresponding file
+                brands = ["vw", "audi", "seat", "skoda", "vwnf"];
+                
+                $.each(brands, function() {
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: "http://webtech.amag.ch:8080/dealerlist?brand=" + this,
+                        timeout: 3000,
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
+                        success: function(response) {
+                            saveText(JSON.stringify(response), this + "dealers.json", function() {
+                                // Do something when the file was written?
+                            })
+                        }
+                    })
+                })
+                // UNGETESTETER CODE!!! BEI PROBLEMEN AUSKOMMENTIEREN --- ENDE
             }
         </script>
     </head>
@@ -478,7 +526,7 @@
                     
                     <div data-role="content">
                         <div data-role="controlgroup" id="campaignselection">
-                            <!-- The campaigns from the server or the file will be loaded here -->
+                            <!-- The campaigns from the server or the file will be inserted here -->
                         </div>
                     </div>
                     
@@ -492,10 +540,6 @@
                     </div>
                 </form>
             </div>
-            <!--
-            <div data-role="footer" data-position="fixed">
-                <h4><img src="img/logos/amag.gray.png"></h4>
-            </div>-->
         </div>
         
         <!-- FAHRZEUGDATEN -->
@@ -503,7 +547,6 @@
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
-                <!--<img class="ui-btn-left brandlogo" width="200px;">-->
             </div>
             
             <div role="main" class="ui-content">
@@ -517,7 +560,7 @@
                     
                     <div data-role="content">
                         <div data-role="controlgroup" id="vehicleselection">
-                            <!-- The models from the server or the file will be loaded here -->
+                            <!-- The models from the server or the file will be inserted here -->
                         </div>
                     </div>
                     
@@ -616,26 +659,21 @@
                                 </fieldset>
                         </div>
                         <div class="ui-block-c" style="width: 70%;">
-                            <input id="pre-rendered-filterable" data-type="search" >
+                            <input id="dealer" data-type="search" >
                                 <div
                                     class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
                                     data-role="controlgroup"
                                     data-filter="true"
-                                    data-input="#pre-rendered-filterable_2"
+                                    data-input="#dealer"
                                     data-filter-reveal="true"
-                                    data-enhanced="true">
+                                    data-enhanced="true"
+                                    id="dealers">
                                         <div class="ui-controlgroup-controls">
                                             
                                         </div>
                                 </div>
                         </div>
                     </div>
-                    
-                    
-                 <!--   <div class="ui-grid-solo">
-                        <div class="ui-block-a"><a href="#dealersearch" class="ui-btn ui-corner-all">Händlersuche</a></div>
-                    </div>
-                  -->
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a"><input type="text" name="phone" id="phone" value="" placeholder="Telefon"></div>
@@ -680,25 +718,6 @@
                 </form>
             </div>
         </div>
-        
-        <!-- HÄNDLERSUCHE -->
-        <!-- Needs much, much work... -->
-        <!--
-        <div data-role="page" id="dealersearch">
-            <div data-role="header">
-                <h1>Händlersuche</h1>
-                <a href="#startscreen" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">Einstellungen</a>
-                <a data-rel="back" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Zurück</a>
-            </div>
-            
-            <div role="main" class="ui-content ui-content-list">
-                <div id="list-canvas">
-                    <ul id="list-results" data-role="listview">
-                        
-                    </ul>
-                </div>
-            </div>
-        </div>-->
         
         <!-- POPUP: ERFOLGSMELDUNG -->
         <div id="submitsuccess" data-theme="a" class="ui-content">

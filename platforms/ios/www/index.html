@@ -34,11 +34,10 @@
             $(document).ready(function() {
                 // This attribute defines whether the DOM of the vehicledata page has been initialized
                 vehicledataDOMinitialized = false;
+                customerdataDOMinitialized = false;
                 
                 //Initalizing general Lead Data (Country and DealerData)
-                
                 initializeCommonLeadData();
-                
             
                 // Get the campaigns and vehicle informations
                 downloadCampaigns();
@@ -190,19 +189,19 @@
                 $('input[name="brand"]:radio').change(function() {
                     switch(this.id) {
                         case "vw":
-                            
+                            executeBrandUpdate("vw");
                             break;
                         case "audi":
-                            $("#brandstyle").attr("href", "css/jquerymobile.nativedroid.color.audi.css");
+                            executeBrandUpdate("audi");
                             break;
                         case "seat":
-                            
+                            executeBrandUpdate("seat");
                             break;
                         case "skoda":
-                            
+                            executeBrandUpdate("skoda");
                             break;
                         case "vwnf":
-                            
+                            executeBrandUpdate("vwnf");
                             break;
                     }
                     
@@ -289,6 +288,34 @@
                 })
                 
                 $("#vehicleselection").enhanceWithin().controlgroup("refresh");
+            }
+        
+            // Begin the dealers update
+            function executeBrandUpdate(brand) {
+                if(!customerdataDOMinitialized) {
+                    setBrandDealers(brand);
+                } else {
+                    $(document).one("pageshow", "#customerdata", function(event) {
+                        setBrandDealers(brand);
+                        customerdataDOMinitialized = true;
+                    })
+                }
+            }
+        
+            // Set the dealers
+            function setBrandDealers(brand) {
+                readText(brand + "dealers.json", function(textRead) {
+                    dealers = jQuery.parseJSON(textRead);
+                    $("#dealers").controlgroup().empty();
+                    
+                    // Create the radio buttons
+                    $.each(dealers, function() {
+                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealerid + '">' + this.dealername1 + '</a>');
+                    });
+                
+                    // A refresh method has to be called, to make jQuery Mobile aware of the changes
+                    $("#dealers").enhanceWithin().controlgroup("refresh");
+                })
             }
         
             // This function checks if there still are failed submissions and shows the retransmit button accordingly
@@ -444,12 +471,30 @@
                     
                         // Create the radio buttons
                         $.each(country, function() {
-                            $("#countries").controlgroup().append('<a href="#" class="ui-screen-hidden" data-role="button" id="' + this.countrycode + '">' + this.countryname + '</a>');
+                            $("#countries").controlgroup().append('<a href="#" class="countryoption ui-screen-hidden" data-role="button" id="' + this.countrycode + '">' + this.countryname + '</a>');
                         });
                 
                         // A refresh method has to be called, to make jQuery Mobile aware of the changes
                         $("#countries").enhanceWithin().controlgroup("refresh");
                     });
+                })
+                
+                brands = ["vw", "audi", "seat", "skoda", "vwnf"];
+                
+                $.each(brands, function() {
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: "http://webtech.amag.ch:8080/dealerlist?brand=" + this,
+                        timeout: 3000,
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
+                        success: function(response) {
+                            saveText(JSON.stringify(response), this + "dealers.json", function() {
+                                // Do something when the file was written?
+                            })
+                        }
+                    })
                 })
             }
         </script>
@@ -616,14 +661,15 @@
                                 </fieldset>
                         </div>
                         <div class="ui-block-c" style="width: 70%;">
-                            <input id="pre-rendered-filterable" data-type="search" >
+                            <input id="dealer" data-type="search" >
                                 <div
                                     class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
                                     data-role="controlgroup"
                                     data-filter="true"
-                                    data-input="#pre-rendered-filterable_2"
+                                    data-input="#dealer"
                                     data-filter-reveal="true"
-                                    data-enhanced="true">
+                                    data-enhanced="true"
+                                    id="dealers">
                                         <div class="ui-controlgroup-controls">
                                             
                                         </div>
