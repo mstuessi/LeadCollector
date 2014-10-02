@@ -13,6 +13,7 @@
         <link rel="stylesheet" href="css/Marken_neutral_AMAG.css" />
         <link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css" />
+        <link rel="stylesheet" href="css/error.css" />
         
         
       <!--  <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.css" />
@@ -22,6 +23,9 @@
         <script type="text/javascript" src="js/fileapi.js"></script>
         <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="js/jquery.mobile-1.4.2.js"></script>
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.js"></script>
+        
+        
         <title>AMAG Leaderfassung</title>
         
         <style>
@@ -39,10 +43,43 @@
                 
                 initializeCommonLeadData();
                 
+                //Validation on
+                
+jQuery.validator.setDefaults({
+    rules: {
+        campaigncode: {
+        required: true
+        },
+        brand: {
+        required: true
+        },
+        focusInvalid: false
+    }
+
+});
+
+var form = $( "#General" );
+form.validate({
+
+     errorPlacement: function(error, element) {
+    var name = element.attr("name");
+    $("#error" + name).append(error);
+  }
+
+});
+$( "button" ).click(function() {
+  if(form.valid()){
+  window.location="#vehicledata";
+  }
+});
+
+
+
             
                 // Get the campaigns and vehicle informations
-                downloadCampaigns();
-                updateAllModels();
+
+
+
                 
                 // Prepare the popups
                 $("#submitsuccess").enhanceWithin().popup();
@@ -66,6 +103,8 @@
                 // Calling the function without the eventlistener wouldn't have any effect, probably because the fileapi.js is not ready at this point
                 document.addEventListener("deviceready", function(){
                     checkForFailedSubmissions();
+                    downloadCampaigns();
+                    updateAllModels();
                 }, false);
                 
                 // If the checkbox for testdrive or orderbrochures was clicked, toggle the value of the hidden input
@@ -224,7 +263,7 @@
                 
                 // Creat the radio buttons
                 $.each(campaigns, function() {
-                    $("#campaignselection").controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode[]" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
+                    $("#campaignselection").controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 // A refresh method has to be called, to make jQuery Mobile aware of the changes
@@ -462,12 +501,12 @@
             </div>
             
             <div role="main" class="ui-content">
-                <form>
+                <form id="General">
                     <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: center">
                         <input type="radio" name="brand" id="vw" value="vw" />
-                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></img></label>
+                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="audi" value="audi" />
-                        <label for="audi"><img src="img/logos/audi.new.png" width="128px" ></label>
+                        <label for="audi"><img src="img/logos/audi.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="seat" value="seat" />
                         <label for="seat"><img src="img/logos/seat.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="skoda" value="skoda" />
@@ -475,21 +514,26 @@
                         <input type="radio" name="brand" id="vwnf" value="vwnf">
                         <label for="vwnf"><img src="img/logos/vwnf.new.png" width="128px"></label>
                     </fieldset>
+                    <span id="errorbrand"></span>
                     
                     <div data-role="content">
                         <div data-role="controlgroup" id="campaignselection">
                             <!-- The campaigns from the server or the file will be loaded here -->
                         </div>
+                        <span id="errorcampaigncode" ></span>
                     </div>
-                    
-                    <div class="ui-grid-a ui-responsive">
-                        <div class="ui-block-a"><a href="#" id="updatevalues" class="ui-btn ui-corner-all">Modelle &amp; Kampagnen aktualisieren</a></div>
-                        <div class="ui-block-b"><a href="#vehicledata" class="ui-btn ui-corner-all">Werte speichern</a></div>
+                                        <div class="ui-grid-solo ui-responsive">
+                        <div class="ui-block-a"><button class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-forward">Mit Auswahl fortsetzten</a></div>
+                       
                     </div>
-                    
-                    <div class="ui-grid-solo ui-responsive">
-                        <div class="ui-block-a"><a href="#" id="retransmit" class="ui-btn ui-corner-all">Fehlgeschlagene Leads versenden</a></div>
+            
+                    <div data-role="footer" data-position="fixed">
+
+<a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-plus">Modelle &amp; Kampagnen aktualisieren</a>
+<a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right">Fehlgeschlagene Leads versenden</a>
+                        
                     </div>
+</div>
                 </form>
             </div>
             <!--
@@ -502,7 +546,7 @@
         <div data-role="page" id="vehicledata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
-                <a href="#startscreen" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i> Startseite </a>
                 <!--<img class="ui-btn-left brandlogo" width="200px;">-->
             </div>
             
@@ -534,8 +578,8 @@
         <div data-role="page" id="customerdata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
-                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i></a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i> Startseite </a>
+                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i> Schritt zurück </a>
             </div>
             
             <div role="main" class="ui-content">
@@ -658,8 +702,8 @@
         <div data-role="page" id="optionaldata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
-                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i></a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i> Startseite </a>
+                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i> Schritt zurück </a>
             </div>
             
             <div role="main" class="ui-content">
