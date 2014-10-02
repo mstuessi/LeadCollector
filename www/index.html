@@ -308,7 +308,7 @@
                     
                     // Create the radio buttons
                     $.each(dealers, function() {
-                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealerid + '">' + this.dealername1 + '</a>');
+                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealer + '">' + this.dealername + ', ' + this.city + ', ' + this.dealer '</a>');
                     });
                 
                     // A refresh method has to be called, to make jQuery Mobile aware of the changes
