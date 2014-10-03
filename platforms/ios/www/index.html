@@ -7,12 +7,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
    <!--     <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />-->
         
         <link rel="stylesheet" href="css/Marken_neutral_AMAG.css" />
         <link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
         <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.3/jquery.mobile.structure-1.4.3.min.css" />
+        <link rel="stylesheet" href="css/error.css" />
         
         
       <!--  <link rel="stylesheet" type="text/css" href="css/jquerymobile.nativedroid.css" />
@@ -22,6 +22,9 @@
         <script type="text/javascript" src="js/fileapi.js"></script>
         <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
         <script type="text/javascript" src="js/jquery.mobile-1.4.2.js"></script>
+        <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.js"></script>
+        
+        
         <title>AMAG Leaderfassung</title>
         
         <style>
@@ -29,6 +32,7 @@
         </style>
         
         <script type="text/javascript">
+        alert("test");
             // Command to quick read the file through the console
             // readText("vw.json", function(textRead){console.log(textRead);});
             $(document).ready(function() {
@@ -37,11 +41,45 @@
                 customerdataDOMinitialized = false;
                 
                 //Initalizing general Lead Data (Country and DealerData)
-                initializeCommonLeadData();
+                
+                
+                
+                //Validation on
+                jQuery.validator.setDefaults({
+                    rules: {
+                        campaigncode: {
+                            required: true,
+                            focusInvalid: false
+                        },
+                        brand: {
+                            required: true,
+                            focusInvalid: false
+                        }
+                    }
+                });
+
+                var form = $( "#General" );
+                form.validate({
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                $( "#continueVehicleData" ).click(function() {
+                    if(form.valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+
+
+
             
                 // Get the campaigns and vehicle informations
-                downloadCampaigns();
-                updateAllModels();
+
+
+
                 
                 // Prepare the popups
                 $("#submitsuccess").enhanceWithin().popup();
@@ -65,6 +103,9 @@
                 // Calling the function without the eventlistener wouldn't have any effect, probably because the fileapi.js is not ready at this point
                 document.addEventListener("deviceready", function(){
                     checkForFailedSubmissions();
+                    downloadCampaigns();
+                    updateAllModels();
+                    initializeCommonLeadData();
                 }, false);
                 
                 // If the checkbox for testdrive or orderbrochures was clicked, toggle the value of the hidden input
@@ -192,16 +233,16 @@
                             executeBrandUpdate("vw");
                             break;
                         case "audi":
-                            executeBrandUpdate("audi");
+                            
                             break;
                         case "seat":
-                            executeBrandUpdate("seat");
+                            
                             break;
                         case "skoda":
-                            executeBrandUpdate("skoda");
+                            
                             break;
                         case "vwnf":
-                            executeBrandUpdate("vwnf");
+                            
                             break;
                     }
                     
@@ -223,7 +264,7 @@
                 
                 // Creat the radio buttons
                 $.each(campaigns, function() {
-                    $("#campaignselection").controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode[]" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
+                    $("#campaignselection").controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode" id="' + this.code + '" value="' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 // A refresh method has to be called, to make jQuery Mobile aware of the changes
@@ -292,7 +333,7 @@
         
             // Begin the dealers update
             function executeBrandUpdate(brand) {
-                if(!customerdataDOMinitialized) {
+                if(customerdataDOMinitialized) {
                     setBrandDealers(brand);
                 } else {
                     $(document).one("pageshow", "#customerdata", function(event) {
@@ -307,12 +348,11 @@
                 readText(brand + "dealers.json", function(textRead) {
                     dealers = jQuery.parseJSON(textRead);
                     $("#dealers").controlgroup().empty();
-                    
                     // Create the radio buttons
                     $.each(dealers, function() {
-                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealerid + '">' + this.dealername1 + '</a>');
+                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealer + '">' + this.dealername + ', ' + this.city + ', ' + this.dealer + '</a>');
                     });
-                
+                    
                     // A refresh method has to be called, to make jQuery Mobile aware of the changes
                     $("#dealers").enhanceWithin().controlgroup("refresh");
                 })
@@ -462,41 +502,47 @@
                     }
                 })
             }
-        
+
+            // This method reads the country information and loads the dealers for each brand into a file
             function initializeCommonLeadData() {
                 $(document).one("pageshow", "#customerdata", function(event) {
                     readText("country.json", function(textRead) {
                         country = jQuery.parseJSON(textRead);
                         $('#countries').controlgroup().empty();
-                    
                         // Create the radio buttons
                         $.each(country, function() {
-                            $("#countries").controlgroup().append('<a href="#" class="countryoption ui-screen-hidden" data-role="button" id="' + this.countrycode + '">' + this.countryname + '</a>');
+                            $("#countries").controlgroup().append('<a href="#" class="countryoption ui-screen-hidden" data-role="button" id="' + this.id + '">' + this.name + '</a>');
                         });
-                
+                        
                         // A refresh method has to be called, to make jQuery Mobile aware of the changes
                         $("#countries").enhanceWithin().controlgroup("refresh");
                     });
                 })
                 
+                // UNGETESTETER CODE!!! BEI PROBLEMEN AUSKOMMENTIEREN --- BEGINN
+                // Die Ausgabe des Servers entspricht unter Umständen nicht der erwarteten Struktur
+                // Iterate through each brand and save the response into the corresponding file
                 brands = ["vw", "audi", "seat", "skoda", "vwnf"];
-                
                 $.each(brands, function() {
+                    currentIterationBrand = this;
+                    alert(this);
                     $.ajax({
                         type: "GET",
+                        async: false,
                         dataType: "json",
-                        url: "http://webtech.amag.ch:8080/dealerlist?brand=" + this,
+                        url: "http://webtech.amag.ch:8080/leadcollector/dealerlist?brand=" + currentIterationBrand,
                         timeout: 3000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
                         success: function(response) {
-                            saveText(JSON.stringify(response), this + "dealers.json", function() {
+                            saveText(JSON.stringify(response), currentIterationBrand + "dealers.json", function() {
                                 // Do something when the file was written?
                             })
                         }
                     })
                 })
-            }
+                // UNGETESTETER CODE!!! BEI PROBLEMEN AUSKOMMENTIEREN --- ENDE
+}
         </script>
     </head>
     <body>
@@ -507,12 +553,12 @@
             </div>
             
             <div role="main" class="ui-content">
-                <form>
+                <form id="General">
                     <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: center">
                         <input type="radio" name="brand" id="vw" value="vw" />
-                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></img></label>
+                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="audi" value="audi" />
-                        <label for="audi"><img src="img/logos/audi.new.png" width="128px" ></label>
+                        <label for="audi"><img src="img/logos/audi.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="seat" value="seat" />
                         <label for="seat"><img src="img/logos/seat.new.png" width="128px"></label>
                         <input type="radio" name="brand" id="skoda" value="skoda" />
@@ -520,21 +566,26 @@
                         <input type="radio" name="brand" id="vwnf" value="vwnf">
                         <label for="vwnf"><img src="img/logos/vwnf.new.png" width="128px"></label>
                     </fieldset>
+                    <span id="errorbrand"></span>
                     
                     <div data-role="content">
                         <div data-role="controlgroup" id="campaignselection">
                             <!-- The campaigns from the server or the file will be loaded here -->
                         </div>
+                        <span id="errorcampaigncode" ></span>
                     </div>
-                    
-                    <div class="ui-grid-a ui-responsive">
-                        <div class="ui-block-a"><a href="#" id="updatevalues" class="ui-btn ui-corner-all">Modelle &amp; Kampagnen aktualisieren</a></div>
-                        <div class="ui-block-b"><a href="#vehicledata" class="ui-btn ui-corner-all">Werte speichern</a></div>
+                                        <div class="ui-grid-solo ui-responsive">
+                        <div class="ui-block-a"><a href="#vehicledata" id="continueVehicleData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Mit Auswahl fortsetzten</a></div>
+                       
                     </div>
-                    
-                    <div class="ui-grid-solo ui-responsive">
-                        <div class="ui-block-a"><a href="#" id="retransmit" class="ui-btn ui-corner-all">Fehlgeschlagene Leads versenden</a></div>
+            
+                    <div data-role="footer" data-position="fixed">
+
+<a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-refresh">Modelle &amp; Kampagnen aktualisieren</a>
+<a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right">Fehlgeschlagene Leads versenden</a>
+                        
                     </div>
+</div>
                 </form>
             </div>
             <!--
@@ -547,7 +598,7 @@
         <div data-role="page" id="vehicledata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
-                <a href="#startscreen" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                 <!--<img class="ui-btn-left brandlogo" width="200px;">-->
             </div>
             
@@ -567,7 +618,7 @@
                     </div>
                     
                     <div class="ui-grid-solo">
-                        <div class="ui-block-a"><a href="#customerdata" class="ui-btn ui-corner-all">Interessentendaten</a></div>
+                        <div class="ui-block-a"><a href="#customerdata" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Interessentendaten</a></div>
                         <input type="hidden" name="testdrive" value="false">
                         <input type="hidden" name="orderbrochures" value="false">
                     </div>
@@ -579,8 +630,8 @@
         <div data-role="page" id="customerdata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
-                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i></a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button">Schritt zurück </a>
             </div>
             
             <div role="main" class="ui-content">
@@ -661,7 +712,7 @@
                                 </fieldset>
                         </div>
                         <div class="ui-block-c" style="width: 70%;">
-                            <input id="dealer" data-type="search" >
+                            <input id="dealer" name="dealer" data-type="search" >
                                 <div
                                     class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
                                     data-role="controlgroup"
@@ -670,9 +721,7 @@
                                     data-filter-reveal="true"
                                     data-enhanced="true"
                                     id="dealers">
-                                        <div class="ui-controlgroup-controls">
-                                            
-                                        </div>
+                                    
                                 </div>
                         </div>
                     </div>
@@ -693,8 +742,8 @@
                     </div>
                     
                     <div class="ui-grid-a">
-                        <div class="ui-block-a"><a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all">Absenden</a></div>
-                        <div class="ui-block-b"><a href="#optionaldata" id="optionalinformation" class="ui-btn ui-corner-all">Optionale Angaben</a></div>
+                        <div class="ui-block-a"><a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-action">Absenden</a></div>
+                        <div class="ui-block-b"><a href="#optionaldata" id="optionalinformation" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Optionale Angaben</a></div>
                     </div>
                 </form>
             </div>
@@ -704,8 +753,8 @@
         <div data-role="page" id="optionaldata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i></a>
-                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i></a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button"> Startseite </a>
+                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button "> Schritt zurück </a>
             </div>
             
             <div role="main" class="ui-content">
