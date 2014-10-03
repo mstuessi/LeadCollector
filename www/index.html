@@ -7,7 +7,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
    <!--     <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />-->
         
         <link rel="stylesheet" href="css/Marken_neutral_AMAG.css" />
@@ -48,12 +47,14 @@
 jQuery.validator.setDefaults({
     rules: {
         campaigncode: {
-        required: true
+            required: true,
+            focusInvalid: false
         },
         brand: {
-        required: true
-        },
+        required: true,
         focusInvalid: false
+        }
+        
     }
 
 });
@@ -67,9 +68,11 @@ form.validate({
   }
 
 });
-$( "button" ).click(function() {
+$( "#continueVehicleData" ).click(function() {
   if(form.valid()){
-  window.location="#vehicledata";
+    return true;
+  } else {
+    return false;
   }
 });
 
@@ -523,13 +526,13 @@ $( "button" ).click(function() {
                         <span id="errorcampaigncode" ></span>
                     </div>
                                         <div class="ui-grid-solo ui-responsive">
-                        <div class="ui-block-a"><button class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-forward">Mit Auswahl fortsetzten</a></div>
+                        <div class="ui-block-a"><a href="#vehicledata" id="continueVehicleData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Mit Auswahl fortsetzten</a></div>
                        
                     </div>
             
                     <div data-role="footer" data-position="fixed">
 
-<a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-plus">Modelle &amp; Kampagnen aktualisieren</a>
+<a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-refresh">Modelle &amp; Kampagnen aktualisieren</a>
 <a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right">Fehlgeschlagene Leads versenden</a>
                         
                     </div>
@@ -546,7 +549,7 @@ $( "button" ).click(function() {
         <div data-role="page" id="vehicledata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i> Startseite </a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                 <!--<img class="ui-btn-left brandlogo" width="200px;">-->
             </div>
             
@@ -566,7 +569,7 @@ $( "button" ).click(function() {
                     </div>
                     
                     <div class="ui-grid-solo">
-                        <div class="ui-block-a"><a href="#customerdata" class="ui-btn ui-corner-all">Interessentendaten</a></div>
+                        <div class="ui-block-a"><a href="#customerdata" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Interessentendaten</a></div>
                         <input type="hidden" name="testdrive" value="false">
                         <input type="hidden" name="orderbrochures" value="false">
                     </div>
@@ -578,8 +581,8 @@ $( "button" ).click(function() {
         <div data-role="page" id="customerdata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i> Startseite </a>
-                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i> Schritt zurück </a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button">Schritt zurück </a>
             </div>
             
             <div role="main" class="ui-content">
@@ -691,8 +694,8 @@ $( "button" ).click(function() {
                     </div>
                     
                     <div class="ui-grid-a">
-                        <div class="ui-block-a"><a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all">Absenden</a></div>
-                        <div class="ui-block-b"><a href="#optionaldata" id="optionalinformation" class="ui-btn ui-corner-all">Optionale Angaben</a></div>
+                        <div class="ui-block-a"><a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-action">Absenden</a></div>
+                        <div class="ui-block-b"><a href="#optionaldata" id="optionalinformation" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Optionale Angaben</a></div>
                     </div>
                 </form>
             </div>
@@ -702,8 +705,8 @@ $( "button" ).click(function() {
         <div data-role="page" id="optionaldata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-wrench"></i> Startseite </a>
-                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all" data-role="button" role="button"><i class="fa lIcon fa-angle-double-left"></i> Schritt zurück </a>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button"> Startseite </a>
+                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button "> Schritt zurück </a>
             </div>
             
             <div role="main" class="ui-content">
