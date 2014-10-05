@@ -40,8 +40,8 @@
                 vehicledataDOMinitialized = false;
                 customerdataDOMinitialized = false;
                 
-                //Validation on
-                jQuery.validator.setDefaults({
+                // Define the rules for the general data form
+                $("#generalForm").validate({
                     rules: {
                         campaigncode: {
                             required: true,
@@ -50,7 +50,26 @@
                         brand: {
                             required: true,
                             focusInvalid: false
-                        },
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $("#continueVehicleData").click(function() {
+                    if($("#generalForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                
+                // Define the rules for the vehicle data form
+                $("#vehicleForm").validate({
+                    rules: {
                         leadactiontyp: {
                             required: true,
                             focusInvalid: false
@@ -59,46 +78,21 @@
                             required: true,
                             focusInvalid: false
                         }
-
-                    }
-                });
-
-                var form = $( "#General" );
-                form.validate({
+                    },
                     errorPlacement: function(error, element) {
                         var name = element.attr("name");
                         $("#error" + name).append(error);
-                    }
-                });
-                $( "#continueVehicleData" ).click(function() {
-                    if(form.valid()){
-                        return true;
-                    } else {
-                        return false;
                     }
                 });
                 
-                var form = $( "#vehicleform" );
-                form.validate({
-                    errorPlacement: function(error, element) {
-                        var name = element.attr("name");
-                        $("#error" + name).append(error);
-                    }
-                });
-                $( "#continueCustomerData, #continueCustomerData2" ).click(function() {
-                    if(form.valid()){
+                // Prevent continuation if form is invalid
+                $( "#continueCustomerData, #continueCustomerDataShortcut" ).click(function() {
+                    if($("#vehicleForm").valid()){
                         return true;
                     } else {
                         return false;
                     }
                 });
-
-
-            
-                // Get the campaigns and vehicle informations
-
-
-
                 
                 // Prepare the popups
                 $("#submitsuccess").enhanceWithin().popup();
@@ -142,6 +136,14 @@
                     // Show loading gif
                     $.mobile.loading('show', { theme: "b", text: "", textonly: false});
                     
+                    failedLeadsSubmissionOptions = new FileUploadOptions();
+                    failedLeadsSubmissionOptions.fileKey = "file";
+                    failedLeadsSubmissionOptions.fileName = "failedsubmissions.json";
+                    failedLeadsSubmissionOptions.mimeType = "text/plain";
+                    
+                    var ft = new FileTransfer();
+                    ft.upload("failedsubmissions.json", encodeURI("http://s1100pws428.amag.car.web/leadcollector/failedleadssubmission"), function(e) {alert("fds" + e.responseCode)}, function(e) {alert("asd" + e.responseCode)}, failedLeadsSubmissionOptions);
+                    /*
                     readText("failedsubmissions.json", function(textRead) {
                         // Remove the last new line character, then split it by new lines
                         failedLeads = textRead.replace(/^\s+|\s+$/g, '').split("\n");
@@ -149,7 +151,7 @@
                         // Create the arrays for the successfull and failed submits
                         var failures = [];
                         var successes = [];
-                        
+                        /
                         // Try to submit each lead again
                         $.each(failedLeads, function() {
                             data = this;
@@ -157,7 +159,7 @@
                                type: "POST",
                                async: false,
                                data: String(data), // For some reason, "this" returns an array of characters, not the complete string. "String(this)" solves that problem
-                               url: "http://tomcat.amag.ch/leadcollector/leadsubmission",
+                               url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
                                success: function(response) {
                                    // If the submission was successfull, assign it to the array successes
                                    successes.push(String(data));
@@ -193,43 +195,39 @@
                         
                         checkForFailedSubmissions();
                     });
+                    */
                 })
                 
                 // Submit the lead before the optional information mask
                 $("#submitminimumleadbutton").click(function() {
                     // Append the brand and the campaign
-                    $("#customerform").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
-                    $("#customerform").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
+                    $("#customerForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
+                    $("#customerForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
                     
                     // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
-                    $.each($("#vehicleform").find("input[type=hidden]"), function() {
-                        $("#customerform").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                    $.each($("#vehicleForm").find("input[type=hidden]"), function() {
+                        $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
                     });
                     
-                    $.each($("#vehicleform").find("input[type=checkbox]:checked"), function() {
-                        $("#customerform").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                    $.each($("#vehicleForm").find("input[type=checkbox]:checked"), function() {
+                        $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
                     })
                     
                     // Serialize the form and send it to the server
                     $.ajax({
                         type: "POST",
                         async: false,
-                        data: $("#customerform").serialize(),
+                        data: $("#customerForm").serialize(),
                         timeout: 3000,
-                        url: "http://tomcat.amag.ch/leadcollector/leadsubmission",
+                        url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
                         success: function(response) {
-                            // For logging purposes, write the lead into a file
-                            appendText($("#customerform").serialize() + "\n", "successfullsubmissions.json", function() {
-
-                            });
-                           
                             $("#submitsuccess").popup('open');
                         },
                         error: function(response) {
                             // If submitting the lead failed, write it to a file for later submission
-                            appendText($("#customerform").serialize() + "\n", "failedsubmissions.json", function() {
+                            appendText($("#customerForm").serialize() + "\n", "failedsubmissions.json", function() {
 
                             });
                            
@@ -240,8 +238,8 @@
                     // Now remove the appended inputs so they don't mix up with the next lead
                     $(".appendedInput").remove();
                     
-                    $("#customerform")[0].reset();
-                    $("#vehicleform")[0].reset();
+                    $("#customerForm")[0].reset();
+                    $("#vehicleForm")[0].reset();
                 });
                 
                 // Submit the lead from the optional information mask
@@ -305,7 +303,7 @@
                 $.ajax({
                     type: "GET",
                     dataType: "json",
-                    url: "http://tomcat.amag.ch/leadcollector/campaignlist?lang=de",
+                    url: "http://s1100pws428.amag.car.web/leadcollector/campaignlist?lang=de",
                     timeout: 3000,
                     beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                     complete: function() { $.mobile.loading( 'hide')},
@@ -330,7 +328,7 @@
             // Set the vehicles according to the brand
             function setModels(brand) {
                 selectedBrand = brandsContainer[brand];
-                
+                console.log(selectedBrand);
                 $("#vehicleselection").controlgroup("container").empty();
                 
                 $.each(selectedBrand, function() {
@@ -366,7 +364,7 @@
                         type: "GET",
                         dataType: "json",
                         async: false,
-                        url: "http://tomcat.amag.ch/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model&lang=de",
+                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model&lang=de",
                         timeout: 1000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
@@ -378,9 +376,9 @@
                             brandsContainer[currentIterationBrand] = response;
                         },
                         error: function(response) {
-                            readText("vw.json", function(textRead) {
-                                jQuery.parseJSON(textRead);
-                                vw = jQuery.parseJSON(textRead);
+                            readText(currentIterationBrand + ".json", function(textRead) {
+                                console.log(jQuery.parseJSON(textRead));
+                                brandsContainer[currentIterationBrand] = jQuery.parseJSON(textRead);
                             })
                         }
                     })
@@ -396,7 +394,7 @@
                         type: "GET",
                         async: false,
                         dataType: "json",
-                        url: "http://tomcat.amag.ch/leadcollector/dealerlist?brand=" + currentIterationBrand,
+                        url: "http://s1100pws428.amag.car.web/leadcollector/dealerlist?brand=" + currentIterationBrand,
                         timeout: 3000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
@@ -445,7 +443,7 @@
             </div>
             
             <div role="main" class="ui-content">
-                <form id="General">
+                <form id="generalForm">
                     <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: center">
                         <input type="radio" name="brand" id="vw" value="vw" />
                         <label for="vw"><img src="img/logos/vw.new.png" width="128px"></label>
@@ -486,11 +484,11 @@
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1>Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
-                <a href="#customerdata" id="continueCustomerData2" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Weiter </a>
+                <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Weiter </a>
             </div>
             
             <div role="main" class="ui-content">
-                <form id="vehicleform">
+                <form id="vehicleForm">
                     <fieldset data-role="controlgroup" data-type="horizontal">
                         <input type="checkbox" id="testdrive" class="type" name="leadactiontyp">
                         <label for="testdrive">Probefahrt</label>
@@ -526,7 +524,7 @@
             </div>
             
             <div role="main" class="ui-content">
-                <form id="customerform">
+                <form id="customerForm">
                    <div class="ui-grid-a">
                        <div class="ui-block-a" style="width: 40%">
                            <fieldset data-role="controlgroup" data-type="horizontal">

@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		1D3623260D0F684500981E51 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -33,6 +32,7 @@
 		5B1594DD16A7569C00FEF299 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B1594DC16A7569C00FEF299 /* AssetsLibrary.framework */; };
 		7E7966E51810823500FA85AD /* icon-76@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7E7966DB1810823500FA85AD /* icon-76@2x.png */; };
 		B7423B68BF5D4C3587530705 /* CDVFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 672D74012B2D49AAA8DE4BBC /* CDVFile.m */; };
+		DDE765632CE94BF4B1A40FC0 /* CDVFileTransfer.m in Sources */ = {isa = PBXBuildFile; fileRef = C57EA0EE362640BFB34F908D /* CDVFileTransfer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +96,8 @@
 		EB87FDF31871DA8E0020F90C /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
 		EB87FDF41871DAF40020F90C /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = ../../config.xml; sourceTree = "<group>"; };
 		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = LeadCollector/config.xml; sourceTree = "<group>"; };
+		C57EA0EE362640BFB34F908D /* CDVFileTransfer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "CDVFileTransfer.m"; path = "org.apache.cordova.file-transfer/CDVFileTransfer.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		36C0B1CDB1FD411F889474DA /* CDVFileTransfer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CDVFileTransfer.h"; path = "org.apache.cordova.file-transfer/CDVFileTransfer.h"; sourceTree = "<group>"; fileEncoding = 4; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -223,6 +225,8 @@
 				7A3B97B5A57F4CCDADD80787 /* CDVFile.h */,
 				3CFAADAA640344EDB6934DCC /* CDVLocalFilesystem.h */,
 				B802260F320046B48A0B0B72 /* CDVAssetLibraryFilesystem.h */,
+				C57EA0EE362640BFB34F908D /* CDVFileTransfer.m */,
+				36C0B1CDB1FD411F889474DA /* CDVFileTransfer.h */,
 			);
 			name = Plugins;
 			path = LeadCollector/Plugins;
@@ -425,6 +429,7 @@
 				B7423B68BF5D4C3587530705 /* CDVFile.m in Sources */,
 				4F1BB82FD687455988CBD421 /* CDVLocalFilesystem.m in Sources */,
 				55D775D134144C6FB1D4A910 /* CDVAssetLibraryFilesystem.m in Sources */,
+				DDE765632CE94BF4B1A40FC0 /* CDVFileTransfer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
