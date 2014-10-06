@@ -1,3 +1,3 @@
 cd /Users/ms/LeadCollector
 cordova build
-say Exit
+say code as shit

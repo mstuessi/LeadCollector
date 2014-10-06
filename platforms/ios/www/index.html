@@ -340,6 +340,16 @@
                 })
                 
                 $("#vehicleselection").enhanceWithin().controlgroup("refresh");
+                
+                selectedBrandaccessory = brandsaccessoryContainer[brand];
+                
+                $("#vehicleselectionaccessory").controlgroup("container").empty();
+                
+                $.each(selectedBrandaccessory, function() {
+                    $("#vehicleselectionaccessory").controlgroup("container").append('<label for="' + this.code + '"><input type="checkbox" name="vlcoptions" id="' + this.code + '" value="' + this.code + '" />'+ this.name + '</label>');
+                })
+                
+                $("#vehicleselectionaccessory").enhanceWithin().controlgroup("refresh");
             }
         
             // This function checks if there still are failed submissions and shows the retransmit button accordingly
@@ -357,9 +367,11 @@
                 $.mobile.loading('hide');
             }
         
-            // Update all models
+            // Update all models and accessory
             function updateAllModels() {
                 brandsContainer = new Array();
+                brandsaccessoryContainer = new Array();
+
                 brands = ["vw", "audi", "seat", "skoda", "vwnf"];
                 
                 $.each(brands, function() {
@@ -385,8 +397,31 @@
                             })
                         }
                     })
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        async: false,
+                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=accessory&lang=de",
+                        timeout: 1000,
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
+                        success: function(response) {
+                            saveText(JSON.stringify(response), currentIterationBrand + "_accessory.json", function() {
+                                // Do something when the file was written?
+                            })
+                       
+                            brandsaccessoryContainer[currentIterationBrand] = response;
+                        },
+                        error: function(response) {
+                            readText(currentIterationBrand + "_accessory.json", function(textRead) {
+                                brandsaccessoryContainer[currentIterationBrand] = jQuery.parseJSON(textRead);
+                            })
+                        }
+                    })
                 })
             }
+        
+            
 
             // This method reads the country information and loads the dealers for each brand into a file
             function initializeDealers() {
@@ -506,6 +541,8 @@
                         </div>
                     </div>
                     
+                    <span id="errorvlcoptions"></span>
+                    
                     <div class="ui-grid-a">
                         <div class="ui-block-a" style="width: 50%">
                             <div data-role="content">
@@ -515,11 +552,13 @@
                             </div>
                         </div>
                         <div class="ui-block-b" style="width: 50%">
-                        
+                            <div data-role="content">
+                                <div data-role="controlgroup" id="vehicleselectionaccessory">
+                                    <!-- The models from the server or the file will be loaded here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
-
                     
                     <span id="errorvlcoptions"></span>
                     
