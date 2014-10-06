@@ -43,7 +43,7 @@
                     },
                     messages: {
                         campaigncode: {
-                            required: "Bitte wählen sie den Kampagniencode der aktuellen Messe aus."
+                            required: "Bitte wählen sie den Kampagnencode der aktuellen Messe aus."
                         },
                         brand: {
                             required: "Bitte wählen sie die Marke für welche Leads erfasst werden."
@@ -93,6 +93,52 @@
                 // Prevent continuation if form is invalid
                 $( "#continueCustomerData, #continueCustomerDataShortcut" ).click(function() {
                     if($("#vehicleForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                // Define the rules for the customer data form
+                $("#customerForm").validate({
+                    rules: {
+                        name: {
+                            required: true
+                        },
+                        surname: {
+                            required: true
+                        },
+                        phone: {
+                            required: function(element) {
+                                return $("#mail").val() == "";
+                            }
+                        },
+                        mail: {
+                            email: true
+                        }
+                    },
+                    messages: {
+                        name: {
+                            required: "Bitte Namen angeben."
+                        },
+                        surname: {
+                            required: "Bitte Vornamen angeben."
+                        },
+                        phone: {
+                            required: "Bitte Telefonnummer oder E-Mailadresse aufnehmen."
+                        },
+                        mail: {
+                            email: "Kein gültiges Format für eine Mailadresse."
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $("#optionalinformation").click(function() {
+                    if($("#customerForm").valid()){
                         return true;
                     } else {
                         return false;
@@ -610,6 +656,9 @@
                         <div class="ui-block-b"><input type="text" name="surname" id="surname" value="" placeholder="Nachname"></div>
                     </div>
                     
+                    <span id="errorname" ></span>
+                    <span id="errorsurname" ></span>
+
                     <div>
                         <div><input type="text" name="surname" id="surname" value="" placeholder="Firma"></div>
                     </div>
@@ -690,6 +739,9 @@
                         <div class="ui-block-a"><input type="number" name="phone" id="phone" value="" placeholder="Telefon"></div>
                         <div class="ui-block-b"><input type="text" name="mail" id="mail" value="" placeholder="Email"></div>
                     </div>
+                    
+                    <span id="errorphone"></span>
+                    <span id="errormail"></span>
                     
                     <div class="ui-grid-solo">
                         <div class="ui-block-a"><textarea name="remarks" id="remarks" value="" placeholder="Bemerkungen"></textarea></div>
