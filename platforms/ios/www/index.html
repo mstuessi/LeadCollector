@@ -29,6 +29,17 @@
                 vehicledataDOMinitialized = false;
                 customerdataDOMinitialized = false;
                 
+                // Init Flipswitches
+                $("#countrySwitch").flipswitch({
+                    onText: "Nein",
+                    offText: "Ja"
+                });
+                
+                $("#dealerSwitch").flipswitch({
+                    onText: "Ja",
+                    offText: "Nein"
+                });
+                
                 // Define the rules for the general data form
                 $("#generalForm").validate({
                     rules: {
@@ -158,6 +169,7 @@
                 $("#updatevalues").click(function() {
                     downloadCampaigns();
                     updateAllModels();
+                    checkForFailedSubmissions();
                 });
                 
                 // Disable the retransmit button
@@ -328,37 +340,67 @@
                 
                 // Save the selected country
                 $("body").on("click", ".countryoption", function() {
-                    $("#country").val($(this).attr("id"));
+                    $("#countrySwitch").prop("checked", true);
+                    $("#countrySwitch").flipswitch("refresh");
+                    $("#selectedCountry").val($(this).attr("id"));
+                    $("#country").val($(this).html());
                     $("#country").attr("data-clear-btn", "true");
                     $("#country").attr("readonly", "true");
                     $(".countryoption").addClass("ui-screen-hidden");
                 })
                 
-                // Save the selected country into a hidden field
+                // Save the selected dealer
                 $("body").on("click", ".dealeroption", function() {
+                    $("#dealerSwitch").prop("checked", true);
+                    $("#dealerSwitch").flipswitch("refresh");
+                    $("#selectedDealer").val($(this).attr("id"));
                     $("#dealer").val($(this).html());
                     $("#dealer").attr("data-clear-btn", "true");
                     $("#dealer").attr("readonly", "true");
-                    $("#selectedDealer").val($(this).attr("id").substr(7));
                     $(".dealeroption").addClass("ui-screen-hidden");
                 })
                 
                 // Clear the country
                 $("#countrySelection").on("click", ".ui-input-clear", function(e){
+                    $("#countrySwitch").prop("checked", false);
+                    $("#countrySwitch").flipswitch("refresh");
                     $("#country").removeAttr("readonly");
+                    $("#selectedCountry").val("");
+                    $("#countrySwitch").prop("checked", false);
+                    $("#countrySwitch").flipswitch("refresh");
                 });
                 
                 // Clear the dealer
                 $("#dealerSelection").on("click", ".ui-input-clear", function(e){
+                    $("#dealerSwitch").prop("checked", false);
+                    $("#dealerSwitch").flipswitch("refresh");
                     $("#dealer").removeAttr("readonly");
                     $("#selectedDealer").val("");
+                    $("#dealerSwitch").prop("checked", false);
+                    $("#dealerSwitch").flipswitch("refresh");
                 });
                 
-                // Init Flipswitches
-                $("#SelectDealer").flipswitch({
-                    onText: "Ja",
-                    offText: "Nein"
-                });
+                // Focus search field if activated or clear input if disabled
+                $("#countrySwitch").change(function(event) {
+                    if($(this).prop("checked")) {
+                        $("#country").focus();
+                    } else {
+                        $("#country").val("");
+                        $("#countrySelection").find(".ui-input-clear").trigger("click");
+                        $("#countrySelection").trigger("updatelayout");
+                    }
+                })
+
+                // Focus search field if activated or clear input if disabled
+                $("#dealerSwitch").change(function(event) {
+                    if($(this).prop("checked")) {
+                        $("#dealer").focus();
+                    } else {
+                        $("#dealer").val("");
+                        $("#dealerSelection").find(".ui-input-clear").trigger("click");
+                        $("#dealerSelection").trigger("updatelayout");
+                    }
+                })
             })
             
             // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
@@ -695,7 +737,7 @@
                     <span id="errorsurname" ></span>
 
                     <div>
-                        <div><input type="text" name="surname" id="surname" value="" placeholder="Firma"></div>
+                        <div><input type="text" name="surname" id="surname" value="" placeholder="Firma" ></div>
                     </div>
                     
                     <div class="ui-grid-a">
@@ -714,14 +756,14 @@
                         </div>
                         <div class="ui-block-b" style="width: 15%; margin-top: 2px;">
                             <fieldset>
-                                <select id="select-based-flipswitch" data-role="flipswitch">
-                                    <option value="leave">Ja</option>
-                                    <option value="arrive">Nein</option>
-                                </select>
+                                <div data-role="field contain" style="margin:2px 0;"​>
+                                    <input type="checkbox" id="countrySwitch" data-role="flipswitch">
+                                    <input type="hidden" id="selectedCountry" name="country" />
+                                </div>
                             </fieldset>
                         </div>
                         <div class="ui-block-c" style="width: 70%;" id="countrySelection">
-                            <input id="country" name="country" data-type="search" >
+                            <input id="country" data-type="search" >
                             <div class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup" data-filter="true" data-input="#country" data-filter-reveal="true" data-enhanced="true" id="countries">
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AD" role="button">Andorra</a>
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AE" role="button">Vereinigte Arabische Emirate</a>
@@ -981,31 +1023,26 @@
                         <div class="ui-block-b" style="width: 15%;">
                                 <fieldset>
                                     <div data-role="field contain" style="margin:2px 0;"​>
-                                        <input type="checkbox" id="SelectDealer" data-role="flipswitch">
+                                        <input type="checkbox" id="dealerSwitch" data-role="flipswitch">
+                                        <input type="hidden" id="selectedDealer" name="dealer" />
                                     </div>
                                 </fieldset>
                         </div>
-                        <div class="ui-block-c" style="width: 70%;">
+                        <div class="ui-block-c" style="width: 70%;" id="dealerSelection">
                             <input id="dealer" name="dealer" data-type="search" >
-                                <div
-                                    class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
-                                    data-role="controlgroup"
-                                    data-filter="true"
-                                    data-input="#dealer"
-                                    data-filter-reveal="true"
-                                    data-enhanced="true"
-                                    id="dealers">
+                            <div
+                                class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
+                                data-role="controlgroup"
+                                data-filter="true"
+                                data-input="#dealer"
+                                data-filter-reveal="true"
+                                data-enhanced="true"
+                                id="dealers">
                                     
-                                </div>
+                            </div>
                         </div>
-                    
-</div>
-                    
-                    
-                 <!--   <div class="ui-grid-solo">
-                        <div class="ui-block-a"><a href="#dealersearch" class="ui-btn ui-corner-all">Händlersuche</a></div>
                     </div>
-                  -->
+                    
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a">
