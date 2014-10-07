@@ -314,23 +314,7 @@
                 // If it already was initialized, immediately update the models
                 // Additionally change the design of the application to the according brand-style
                 $('input[name="brand"]:radio').change(function() {
-                    switch(this.id) {
-                        case "vw":
-                            executeBrandUpdate("vw");
-                            break;
-                        case "audi":
-                            executeBrandUpdate("audi");
-                            break;
-                        case "seat":
-                            executeBrandUpdate("seat");
-                            break;
-                        case "skoda":
-                            executeBrandUpdate("skoda");
-                            break;
-                        case "vwnf":
-                            executeBrandUpdate("vwnf");
-                            break;
-                    }
+                    executeBrandUpdate(this.id);
                     
                     if(vehicledataDOMinitialized) {
                         setModels($('input[name=brand]:checked').val());
@@ -368,6 +352,12 @@
                 $("#dealerSelection").on("click", ".ui-input-clear", function(e){
                     $("#dealer").removeAttr("readonly");
                     $("#selectedDealer").val("");
+                });
+                
+                // Init Flipswitches
+                $("#SelectDealer").flipswitch({
+                    onText: "Ja",
+                    offText: "Nein"
                 });
             })
             
@@ -988,28 +978,28 @@
                         <div class="ui-block-a" style="width: 15%; margin: 0 auto;">
                             <p style="line-height: 53px margin:0;">Wunschpartner:</p>
                         </div>
-                        <div class="ui-block-b" style="width: 15%; margin-top: 2px;">
+                        <div class="ui-block-b" style="width: 15%;">
                                 <fieldset>
-                                        <select id="dealerSwitch" data-role="flipswitch">
-                                            <option value="leave">Nein</option>
-                                            <option value="arrive">Ja</option>
-                                        </select>
+                                    <div data-role="field contain" style="margin:2px 0;"​>
+                                        <input type="checkbox" id="SelectDealer" data-role="flipswitch">
+                                    </div>
                                 </fieldset>
                         </div>
-                        <div class="ui-block-c" style="width: 70%;" id="dealerSelection">
-                            <input id="dealer" data-type="search" />
-                            <input id="selectedDealer" name="dealer" type="hidden" />
-                            <div
-                                class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
-                                data-role="controlgroup"
-                                data-filter="true"
-                                data-input="#dealer"
-                                data-filter-reveal="true"
-                                data-enhanced="true"
-                                id="dealers">
-                            </div>
+                        <div class="ui-block-c" style="width: 70%;">
+                            <input id="dealer" name="dealer" data-type="search" >
+                                <div
+                                    class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
+                                    data-role="controlgroup"
+                                    data-filter="true"
+                                    data-input="#dealer"
+                                    data-filter-reveal="true"
+                                    data-enhanced="true"
+                                    id="dealers">
+                                    
+                                </div>
                         </div>
-                    </div>
+                    
+</div>
                     
                     
                  <!--   <div class="ui-grid-solo">
