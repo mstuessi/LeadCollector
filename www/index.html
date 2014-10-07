@@ -112,10 +112,28 @@
                 // Define the rules for the customer data form
                 $("#customerForm").validate({
                     rules: {
+                        salutation: {
+                            required: true
+                        },
+                        lang: {
+                            required: true
+                        },
                         name: {
                             required: true
                         },
                         surname: {
+                            required: true
+                        },
+                        address: {
+                            required: true
+                        },
+                        houseNumber: {
+                            required: true
+                        },
+                        city: {
+                            required: true
+                        },
+                        zip: {
                             required: true
                         },
                         phone: {
@@ -128,11 +146,29 @@
                         }
                     },
                     messages: {
+                        salutation: {
+                            required: "Bitte eine Anrede wählen."
+                        },
+                        lang: {
+                            required: "Bitte Kundensprache auswählen."
+                        },
                         name: {
-                            required: "Bitte Namen angeben."
+                            required: "Bitte Vornamen angeben."
                         },
                         surname: {
-                            required: "Bitte Vornamen angeben."
+                            required: "Bitte Nachname angeben."
+                        },
+                        address: {
+                            required: "Strassenname wird benötigt."
+                        },
+                        houseNumber: {
+                            required: "Hausnummer wird benötigt."
+                        },
+                        city: {
+                            required: "Ortschaft wird benötigt."
+                        },
+                        zip: {
+                            required: "Postleitzahl wird benötigt."
                         },
                         phone: {
                             required: "Bitte Telefonnummer oder E-Mailadresse aufnehmen."
@@ -263,59 +299,64 @@
                 
                 // Submit the lead before the optional information mask
                 $("#submitminimumleadbutton").click(function() {
-                    // Append the brand and the campaign
-                    $("#customerForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
-                    $("#customerForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
+                    if($("#customerForm").valid()){
+                        // Append the brand and the campaign
+                        $("#customerForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
+                        $("#customerForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
                     
-                    // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
-                    // Get the selected type(s) of the lead
-                    $.each($("#vehicleForm").find("input[type=hidden]"), function() {
-                        $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
-                    });
+                        // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
+                        // Get the selected type(s) of the lead
+                        $.each($("#vehicleForm").find("input[type=hidden]"), function() {
+                            $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        });
                     
-                    // Get all checked options
-                    $.each($("#vehicleForm").find("input[type=checkbox]:checked"), function() {
-                        $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
-                    })
+                        // Get all checked options
+                        $.each($("#vehicleForm").find("input[type=checkbox]:checked"), function() {
+                            $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        })
                     
-                    // Serialize the form and send it to the server
-                    $.ajax({
-                        type: "POST",
-                        async: false,
-                        data: $("#customerForm").serialize(),
-                        timeout: 3000,
-                        url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
-                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
-                        complete: function() { $.mobile.loading( 'hide')},
-                        success: function(response) {
-                            $("#submitsuccess").popup('open');
-                        },
-                        error: function(response) {
-                            // If submitting the lead failed, write it to a file for later submission
-                            appendText($("#customerForm").serialize() + "\n", "failedsubmissions.json", function() {
+                        // Serialize the form and send it to the server
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            data: $("#customerForm").serialize(),
+                            timeout: 3000,
+                            url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
+                            beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                            complete: function() { $.mobile.loading( 'hide')},
+                            success: function(response) {
+                                $("#submitsuccess").popup('open');
+                            },
+                            error: function(response) {
+                                // If submitting the lead failed, write it to a file for later submission
+                                appendText($("#customerForm").serialize() + "\n", "failedsubmissions.json", function() {
 
-                            });
+                                });
                            
-                            $("#submitfailure").popup('open');
-                        }
-                    });
+                                $("#submitfailure").popup('open');
+                            }
+                        });
                     
-                    // Now remove the appended inputs so they don't mix up with the next lead
-                    $(".appendedInput").remove();
+                        // Now remove the appended inputs so they don't mix up with the next lead
+                        $(".appendedInput").remove();
                     
-                    // Reset all forms
-                    $("#customerForm")[0].reset();
-                    $("#vehicleForm")[0].reset();
+                        // Reset all forms
+                        $("#customerForm")[0].reset();
+                        $("#vehicleForm")[0].reset();
                     
-                    // The hidden inputs won't be reseted for some reason, so clear them manually
-                    $("input[name=testdrive]").val("false");
-                    $("input[name=orderbrochures]").val("false");
+                        // The hidden inputs won't be reseted for some reason, so clear them manually
+                        $("input[name=testdrive]").val("false");
+                        $("input[name=orderbrochures]").val("false");
                     
-                    // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
-                    // After the lead has been submitted, this must be reseted, so the next customer can change the value
-                    $("#country").removeAttr("readonly");
-                    $("#dealer").removeAttr("readonly");
-                    $("#selectedDealer").val("");
+                        // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
+                        // After the lead has been submitted, this must be reseted, so the next customer can change the value
+                        $("#country").removeAttr("readonly");
+                        $("#dealer").removeAttr("readonly");
+                        $("#selectedDealer").val("");
+                    } else {
+                        return false;
+                    }
+
                 });
                 
                 // Submit the lead from the optional information mask
@@ -695,8 +736,6 @@
                         </div>
                     </div>
                     
-                    <span id="errorvlcoptions"></span>
-                    
                     <div class="ui-grid-solo">
                         <div class="ui-block-a"><a href="#customerdata"  id="continueCustomerData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Interessentendaten</a></div>
                         <input type="hidden" name="testdrive" value="false">
@@ -739,6 +778,9 @@
                        
                        </div>
                    </div>
+                   
+                    <span id="errorsalutation" ></span>
+                    <span id="errorlang" ></span>
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a"><input type="text" name="name" id="name" value="" placeholder="Vorname" autocapitalize="off" autocorrect="off"></div>
@@ -754,13 +796,19 @@
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a" style="width: 90%;"><input type="text" name="address" id="address" value="" placeholder="Adresse" autocapitalize="off" autocorrect="off"></div>
-                        <div class="ui-block-b" style="width: 10%;"><input type="number" name="houseNumber" id="houseNumber" value="" placeholder="Nr." autocapitalize="off" autocorrect="off"></div>
+                        <div class="ui-block-b" style="width: 10%;"><input type="text" name="houseNumber" id="houseNumber" value="" placeholder="Nr." autocapitalize="off" autocorrect="off"></div>
                     </div>
+                    
+                    <span id="erroraddress" ></span>
+                    <span id="errorhouseNumber" ></span>
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a" style="width: 20%;"><input type="number" name="zip" id="zip" value="" placeholder="PLZ" autocapitalize="off" autocorrect="off"></div>
                         <div class="ui-block-b" style="width: 80%;"><input type="text" name="city" id="city" value="" placeholder="Ort" autocapitalize="off" autocorrect="off"></div>
                     </div>
+                    
+                    <span id="errorzip" ></span>
+                    <span id="errorcity" ></span>
                     
                     <div class="ui-grid-b">
                         <div class="ui-block-a" style="width: 15%; margin: 0 auto;">
@@ -819,7 +867,6 @@
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CD" role="button">Demokratische Republik Kongo</a>
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CF" role="button">Zentralafrikanische Republik</a>
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CG" role="button">Kongo</a>
-                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CH" role="button">Schweiz</a>
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CI" role="button">Côte d’Ivoire</a>
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CK" role="button">Cookinseln</a>
                                 <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CL" role="button">Chile</a>
@@ -1058,7 +1105,7 @@
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a">
-                            <input type="number" name="phone" id="phone" value="" placeholder="Telefon" autocapitalize="off" autocorrect="off" />
+                            <input type="tel" name="phone" id="phone" value="" placeholder="Telefon" autocapitalize="off" autocorrect="off" />
                         </div>
                         <div class="ui-block-b">
                             <input type="text" name="mail" id="mail" value="" placeholder="Email" autocapitalize="off" autocorrect="off" />
@@ -1070,7 +1117,7 @@
                     
                     <div class="ui-grid-solo">
                         <div class="ui-block-a">
-                            <textarea name="remarks" id="remarks" value="" placeholder="Bemerkungen" autocapitalize="off" autocorrect="off"></textarea>
+                            <textarea rows="4" name="remarks" id="remarks" value="" placeholder="Bemerkungen" autocapitalize="off" autocorrect="off"></textarea>
                         </div>
                     </div>
                     
