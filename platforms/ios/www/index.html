@@ -329,6 +329,7 @@
                     }
                 })
                 
+                // Save the selected country
                 $("body").on("click", ".countryoption", function() {
                     $("#country").val($(this).attr("id"));
                     $("#country").attr("data-clear-btn", "true");
@@ -336,6 +337,7 @@
                     $(".countryoption").addClass("ui-screen-hidden");
                 })
                 
+                // Save the selected country into a hidden field
                 $("body").on("click", ".dealeroption", function() {
                     $("#dealer").val($(this).html());
                     $("#dealer").attr("data-clear-btn", "true");
@@ -344,10 +346,12 @@
                     $(".dealeroption").addClass("ui-screen-hidden");
                 })
                 
+                // Clear the country
                 $("#countrySelection").on("click", ".ui-input-clear", function(e){
                     $("#country").removeAttr("readonly");
                 });
                 
+                // Clear the dealer
                 $("#dealerSelection").on("click", ".ui-input-clear", function(e){
                     $("#dealer").removeAttr("readonly");
                     $("#selectedDealer").val("");
@@ -457,9 +461,8 @@
                             brandsContainer[currentIterationBrand] = response;
                         },
                         error: function(response) {
-                            readText(currentIterationBrand + ".json", function(textRead) {
-                                brandsContainer[currentIterationBrand] = jQuery.parseJSON(textRead);
-                            })
+                            readBrandModels(currentIterationBrand);
+                           
                         }
                     })
                     $.ajax({
@@ -478,15 +481,25 @@
                             brandsaccessoryContainer[currentIterationBrand] = response;
                         },
                         error: function(response) {
-                            readText(currentIterationBrand + "_accessory.json", function(textRead) {
-                                brandsaccessoryContainer[currentIterationBrand] = jQuery.parseJSON(textRead);
-                            })
+                            readBrandAccessory(currentIterationBrand);
                         }
                     })
                 })
             }
         
-            
+            // Read the models of the brand from the file
+            function readBrandModels(brand) {
+                readText(brand + ".json", function(textRead) {
+                    brandsContainer[brand] = jQuery.parseJSON(textRead);
+                })
+            }
+        
+            // Read the accessory of the brand from the file
+            function readBrandAccessory(brand) {
+                readText(brand + "_accessory.json", function(textRead) {
+                    brandsaccessoryContainer[brand] = jQuery.parseJSON(textRead);
+                })
+            }
 
             // This method reads the country information and loads the dealers for each brand into a file
             function initializeDealers() {
