@@ -256,10 +256,12 @@
                     $("#customerForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
                     
                     // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
+                    // Get the selected type(s) of the lead
                     $.each($("#vehicleForm").find("input[type=hidden]"), function() {
                         $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
                     });
                     
+                    // Get all checked options
                     $.each($("#vehicleForm").find("input[type=checkbox]:checked"), function() {
                         $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
                     })
@@ -289,8 +291,19 @@
                     // Now remove the appended inputs so they don't mix up with the next lead
                     $(".appendedInput").remove();
                     
+                    // Reset all forms
                     $("#customerForm")[0].reset();
                     $("#vehicleForm")[0].reset();
+                    
+                    // The hidden inputs won't be reseted for some reason, so clear them manually
+                    $("input[name=testdrive]").val("false");
+                    $("input[name=orderbrochures]").val("false");
+                    
+                    // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
+                    // After the lead has been submitted, this must be reseted, so the next customer can change the value
+                    $("#country").removeAttr("readonly");
+                    $("#dealer").removeAttr("readonly");
+                    $("#selectedDealer").val("");
                 });
                 
                 // Submit the lead from the optional information mask
@@ -1043,7 +1056,7 @@
             </div>
             
             <div role="main" class="ui-content">
-                <form id="optionalform">
+                <form id="optionalForm">
                     <div class="ui-grid-b" >
                         <div class="ui-block-a" style="width: 42%">
                             <input type="text" name="currentBrand" id="currentBrand" value="" placeholder="Aktuelle Marke">
