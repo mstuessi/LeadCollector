@@ -1063,7 +1063,7 @@
                             <input type="tel" name="phone" id="phone" value="" placeholder="Telefon" autocapitalize="off" autocorrect="off" />
                         </div>
                         <div class="ui-block-b">
-                            <input type="text" name="mail" id="mail" value="" placeholder="Email" autocapitalize="off" autocorrect="off" />
+                            <input type="email" name="mail" id="mail" value="" placeholder="Email" autocapitalize="off" autocorrect="off" />
                         </div>
                     </div>
                     
@@ -1073,6 +1073,18 @@
                     <div class="ui-grid-solo">
                         <div class="ui-block-a">
                             <textarea rows="4" name="remarks" id="remarks" value="" placeholder="Bemerkungen" autocapitalize="off" autocorrect="off"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a">
+                            <div class="ui-field-contain">
+                                <fieldset data-role="controlgroup">
+                                    <legend>Datenschutzbestimmungen</legend>
+                                    <input type="checkbox" name="conditionsaccepted" id="conditionsaccepted" class="custom" data-mini="true" checked>
+                                    <label for="conditionsaccepted">Einverstanden mit der Nutzung der personenbezogenen Daten</label>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
                     
@@ -1088,38 +1100,265 @@
             </div>
         </div>
         
-        <!-- OPTIONALE ANGABEN -->
-        <div data-role="page" id="optionaldata" data-theme="b">
-            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
-                <h1>Interessentendaten</h1>
-                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
-                <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button ">Schritt zurück </a>
-            </div>
-            
-            <div role="main" class="ui-content">
-                <form id="optionalForm">
-                    <div class="ui-grid-b" >
-                        <div class="ui-block-a" style="width: 42%">
-                            <input type="text" name="currentBrand" id="currentBrand" value="" placeholder="Aktuelle Marke">
+              <!-- OPTIONALE ANGABEN -->
+            <div data-role="page" id="optionaldata" data-theme="b">
+                <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                    <h1>Interessentendaten</h1>
+                    <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                    <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button ">Schritt zurück </a>
+                </div>
+                
+                <div role="main" class="ui-content">
+                    <form id="optionalForm">
+                                    <div class="ui-grid-b">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Angaben zur Person:</p>
                         </div>
-                        <div class="ui-block-b" style="width: 42%">
-                            <input type="text" name="currentModel" id="currentModel" value="" placeholder="Aktuelles Modell">
+                        <div class="ui-block-b" style="width: 31%;">
+                            <input type="number" name="age" id="age" value="" placeholder="Alter">
                         </div>
-                        <div class="ui-block-c" style="width: 15%">
-                            <input type="text" name="vehicleAge" id="vehicleAge" value="" placeholder="Fahrzeugalter">
+                        <div class="ui-block-c" style="width: 49%;">
+                            <p></p>
+                        </div>
+                    </div>
+                    <div class="ui-grid-c">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Aktuelles Fahrzeug:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;" id="makerselection">
+                            <input id="selectmaker" data-type="search" placeholder="Marke">
+                            <div class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup" data-filter="true" data-input="#selectmaker" data-filter-reveal="true" data-enhanced="true">
+                                <div class="ui-controlgroup-controls">
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Abarth</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">AC</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Acura</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Alfa Romeo</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Allard</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Alpina</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Alpine</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Alvis</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">AMC</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Ariel</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Armstrong Siddeley</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Ascari</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Aston Martin</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Audi</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Austin</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Austin-Healey</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Autobianchi</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Auverland</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Avanti</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Beijing</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Bentley</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Berkeley</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Bitter</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Bizzarrini</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">BMW</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Brilliance</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Bristol</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Bugatti</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Buick</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Cadillac</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Caterham</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Checker</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Chevrolet</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Chrysler</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Citroen</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Dacia</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Daewoo</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">DAF</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Daihatsu</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Daimler</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Datsun</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">De Tomaso</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">DKW</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Dodge</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Donkervoort</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Eagle</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Fairthorpe</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Ferrari</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Fiat</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Fisker</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Ford</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">GAZ</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Geely</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Ginetta</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">GMC</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Holden</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Honda</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Hudson</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Humber</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Hummer</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Hyundai</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Infiniti</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Innocenti</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Isuzu</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Italdesign</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Jaguar</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Jeep</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Jensen</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Kia</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Koenigsegg</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lada</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lamborghini</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lancia</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Land Rover</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lexus</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lincoln</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lotec</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Lotus</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Luxgen</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Mahindra</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Marcos</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Maserati</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Matra-Simca</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Maybach</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Mazda</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">MCC</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">McLaren</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Mercedes-Benz</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Mercury</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">MG</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Mini</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Mitsubishi</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Monteverdi</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Moretti</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Morgan</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Morris</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Nissan</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Noble</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">NSU</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Oldsmobile</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Opel</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Packard</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Pagani</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Panoz</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Peugeot</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Pininfarina</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Plymouth</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Pontiac</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Porsche</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Proton</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Reliant</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Renault</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Riley</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Rolls-Royce</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Rover</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Saab</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Saleen</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Samsung</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Saturn</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Scion</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Seat</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Simca</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Singer</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Skoda</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Smart</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Spyker</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">SsangYong</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">SSC</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Steyr</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Studebaker</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Subaru</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Sunbeam</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Suzuki</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Talbot</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Tata</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Tatra</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Tesla</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Toyota</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Trabant</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Triumph</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">TVR</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Vauxhall</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Vector</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Venturi</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Volkswagen</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Volvo</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Wartburg</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Westfield</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Willys-Overland</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Xedos</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Zagato</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Zastava</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">ZAZ</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">Zenvo</a>
+                                    <a href="#" class="currentmakeroption ui-screen-hidden" data-role="button">ZIL</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-block-c" style="width: 31%;">
+                        
+                        </div>
+                        <div class="ui-block-d" style="width: 18%;" margin: 0 auto;>
+                        
+                        </div>
+                    </div>
+                
+                
+                    <div class="ui-grid-c">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;" id="makerselection">
+                             <input type="text" name="currentModel" id="currentModel" value="" placeholder="Aktuelles Modell">
+                        </div>
+                        <div class="ui-block-c" style="width: 31%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-d" style="width: 18%;" margin: 0 auto;>
+                            <p style="line-height: 53px margin:0;"></p>
                         </div>
                     </div>
                     
+                    <div class="ui-grid-c">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;" id="makerselection">
+                            <select name="vehicleAge" id="vehicleAge" data-mini="true">
+                                <option value="na">Alter</option>
+                                <option value="1">1 Jahr</option>
+                                <option value="2">2 Jahre</option>
+                                <option value="3">3 Jahre</option>
+                                <option value="4">4 Jahre</option>
+                                <option value="5">5 Jahre</option>
+                                <option value="6">6 Jahre</option>
+                                <option value="7">7 Jahre</option>
+                                <option value="8">8 Jahre</option>
+                                <option value="9">9 Jahre</option>
+                                <option value="10">10 Jahre</option>
+                                <option value="10+">über 10 Jahre</option>
+                            </select>
+                        </div>
+                        <div class="ui-block-c" style="width: 31%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-d" style="width: 18%;" margin: 0 auto;>
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                    </div>
+                
                     <div class="ui-grid-a">
-                        
-                        <div class="ui-block-b">
-                            <div class="ui-field-contain">
-                                <select name="select-native-1" id="select-native-1" data-mini="true">
-                                    <option value="1">The 1st Option</option>
-                                    <option value="2">The 2nd Option</option>
-                                    <option value="3">The 3rd Option</option>
-                                    <option value="4">The 4th Option</option>
-                                </select>
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Neuanschaffung geplant:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 40%;">
+                           <div class="ui-field-contain">
+                              <fieldset data-role="controlgroup">
+
+                                <input type="radio" name="intendedpurchase" value="4" id="intendedpurchase-choice-1">
+                                <label for="intendedpurchase-choice-1">in den nächsten vier Monaten</label>
+                             
+                                <input type="radio" name="intendedpurchase" value="9" id="intendedpurchase-choice-2">
+                                <label for="intendedpurchase-choice-2">in den nächsten neun Monaten</label>
+                             
+                                <input type="radio" name="intendedpurchase" value="12" id="intendedpurchase-choice-3">
+                                <label for="intendedpurchase-choice-3">innert einem Jahr</label>
+                             
+                                <input type="radio" name="intendedpurchase" value="12+" id="intendedpurchase-choice-4">
+                                <label for="intendedpurchase-choice-4">später</label>
+                              </fieldset>
                             </div>
                         </div>
                     </div>
