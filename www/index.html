@@ -403,6 +403,11 @@
                         $("#dealerSelection").trigger("updatelayout");
                     }
                 })
+                
+                // Always check for failed submissions when the startscreen is loaded
+                $("#startscreen").on("pageshow", function(event, ui) {
+                    checkForFailedSubmissions();
+                });
             })
             
             // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
@@ -637,7 +642,7 @@
             
                     <div data-role="footer" data-position="fixed">
                         <a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-refresh">Modelle &amp; Kampagnen aktualisieren</a>
-                        <a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right">Fehlgeschlagene Leads versenden</a>
+                        <a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right" style="background: #e2001a; color: white;">Fehlgeschlagene Leads versenden</a>
                     </div>
                 </form>
             </div>
