@@ -232,69 +232,26 @@
                 
                 // Submit the failed leads
                 $("#retransmit").click(function() {
-                    // Show loading gif
                     $.mobile.loading('show', { theme: "b", text: "", textonly: false});
-                    
-                    failedLeadsSubmissionOptions = new FileUploadOptions();
-                    failedLeadsSubmissionOptions.fileKey = "file";
-                    failedLeadsSubmissionOptions.fileName = "failedsubmissions.json";
-                    failedLeadsSubmissionOptions.mimeType = "text/plain";
-                    
-                    var ft = new FileTransfer();
-                    ft.upload("failedsubmissions.json", encodeURI("http://s1100pws428.amag.car.web/leadcollector/failedleadssubmission"), uploadFailure, uploadSuccess, failedLeadsSubmissionOptions);
-                    /*
                     readText("failedsubmissions.json", function(textRead) {
-                        // Remove the last new line character, then split it by new lines
-                        failedLeads = textRead.replace(/^\s+|\s+$/g, '').split("\n");
-                        
-                        // Create the arrays for the successfull and failed submits
-                        var failures = [];
-                        var successes = [];
-                        /
-                        // Try to submit each lead again
-                        $.each(failedLeads, function() {
-                            data = this;
-                            $.ajax({
-                               type: "POST",
-                               async: false,
-                               data: String(data), // For some reason, "this" returns an array of characters, not the complete string. "String(this)" solves that problem
-                               url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
-                               success: function(response) {
-                                   // If the submission was successfull, assign it to the array successes
-                                   successes.push(String(data));
-                               },
-                               error: function(response) {
-                                   // If the submission has failed, assign it to the array failures
-                                   failures.push(String(data));
-                               }
-                            });
-                        })
-                        
-                        // Iterate through each failure and create the string to write in to the file
-                        failuresString = "";
-                        $.each(failures, function() {
-                            failuresString = failuresString + this + "\n";
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            data: {
+                                submissions: textRead
+                            },
+                            url: "http://s1100pws428.amag.car.web/leadcollector/failedleadssubmission",
+                            success: function(response) {
+                                saveText("", "failedsubmissions.json", function() {
+                                    checkForFailedSubmissions();
+                                    $.mobile.loading('hide', { theme: "b", text: "", textonly: false});
+                                });
+                            },
+                            error: function(response) {
+                                
+                            }
                         });
-                        
-                        // Iterate through each success and create the string to write in to the file
-                        successesString = "";
-                        $.each(successes, function() {
-                            successesString = successesString + this + "\n";
-                        });
-                        
-                        // Write the failures
-                        saveText(failuresString, "failedsubmissions.json", function() {
-                            
-                        });
-                        
-                        // Write the successes
-                        appendText(successesString, "successfullsubmissions.json", function() {
-                            
-                        });
-                        
-                        checkForFailedSubmissions();
-                    });
-                    */
+                    })
                 })
                 
                 // Submit the lead before the optional information mask
@@ -555,6 +512,7 @@
                            
                         }
                     })
+                    
                     $.ajax({
                         type: "GET",
                         dataType: "json",
@@ -638,14 +596,6 @@
                     // A refresh method has to be called, to make jQuery Mobile aware of the changes
                     $("#dealers").enhanceWithin().controlgroup("refresh");
                 })
-            }
-        
-            function uploadSuccess(response) {
-                alert("success");
-            }
-        
-            function uploadFailure(error) {
-                alert("failure");
             }
         </script>
     </head>
@@ -1088,7 +1038,7 @@
                                 </fieldset>
                         </div>
                         <div class="ui-block-c" style="width: 70%;" id="dealerSelection">
-                            <input id="dealer" name="dealer" data-type="search" autocapitalize="off" autocorrect="off">
+                            <input id="dealer" data-type="search" autocapitalize="off" autocorrect="off">
                             <div
                                 class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
                                 data-role="controlgroup"
