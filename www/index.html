@@ -248,7 +248,7 @@
                                 });
                             },
                             error: function(response) {
-                                
+                                $.mobile.loading('hide', { theme: "b", text: "", textonly: false});
                             }
                         });
                     })
@@ -279,7 +279,7 @@
                         })
                         
                         // Now get the radio buttons for the intended purchase
-                        $("#customerForm").append($("input[name=intendedpurchase]:checked").clone().attr("type", "hidden").addClass("appendedInput"));
+                        $("#customerForm").append($("input[name=intendedPurchase]:checked").clone().attr("type", "hidden").addClass("appendedInput"));
                     
                         // Serialize the form and send it to the server
                         $.ajax({
@@ -846,7 +846,7 @@
                     <span id="errorsurname" ></span>
 
                     <div>
-                        <div><input type="text" name="surname" id="surname" value="" placeholder="Firma" autocapitalize="off" autocorrect="off"></div>
+                        <div><input type="text" name="company" id="company" value="" placeholder="Firma" autocapitalize="off" autocorrect="off"></div>
                     </div>
                     
                     <div class="ui-grid-a">
@@ -1181,8 +1181,8 @@
                             <div class="ui-field-contain">
                                 <fieldset data-role="controlgroup">
                                     <legend>Datenschutzbestimmungen</legend>
-                                    <input type="checkbox" name="conditionsaccepted" id="conditionsaccepted" class="custom" data-mini="true" checked value="true">
-                                    <label for="conditionsaccepted">Einverstanden mit der Nutzung der personenbezogenen Daten</label>
+                                    <input type="checkbox" name="conditionsAccepted" id="conditionsAccepted" class="custom" data-mini="true" checked value="true">
+                                    <label for="conditionsAccepted">Einverstanden mit der Nutzung der personenbezogenen Daten</label>
                                 </fieldset>
                             </div>
                         </div>
@@ -1226,7 +1226,7 @@
                             <p style="line-height: 53px margin:0;">Aktuelles Fahrzeug:</p>
                         </div>
                         <div class="ui-block-b" style="width: 31%;" id="brandSelection">
-                            <input id="currentBrand" name="currentbrand" data-type="search" placeholder="Marke" autocapitalize="off" autocorrect="off">
+                            <input id="currentBrand" name="currentBrand" data-type="search" placeholder="Marke" autocapitalize="off" autocorrect="off">
                             <div class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup" data-filter="true" data-input="#currentBrand" data-filter-reveal="true" data-enhanced="true">
                                 <div class="ui-controlgroup-controls">
                                     <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Abarth</a>
@@ -1446,13 +1446,13 @@
                         <div class="ui-block-b" style="width: 40%;">
                            <div class="ui-field-contain">
                               <fieldset data-role="controlgroup">
-                                <input type="radio" name="intendedpurchase" value="4" id="intendedpurchase-choice-1">
+                                <input type="radio" name="intendedPurchase" value="4" id="intendedpurchase-choice-1">
                                 <label for="intendedpurchase-choice-1">in den nächsten vier Monaten</label>
                                 <input type="radio" name="intendedpurchase" value="9" id="intendedpurchase-choice-2">
                                 <label for="intendedpurchase-choice-2">in den nächsten neun Monaten</label>
-                                <input type="radio" name="intendedpurchase" value="12" id="intendedpurchase-choice-3">
+                                <input type="radio" name="intendedPurchase" value="12" id="intendedpurchase-choice-3">
                                 <label for="intendedpurchase-choice-3">innert einem Jahr</label>
-                                <input type="radio" name="intendedpurchase" value="12+" id="intendedpurchase-choice-4">
+                                <input type="radio" name="intendedPurchase" value="12+" id="intendedpurchase-choice-4">
                                 <label for="intendedpurchase-choice-4">später</label>
                               </fieldset>
                             </div>
