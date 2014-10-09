@@ -192,6 +192,34 @@
                     }
                 });
                 
+                
+                // Define the rules for the optionaldata data form
+                $("#optionalForm").validate({
+                    rules: {
+                        age: {
+                            maxlength: 2
+                        }
+                    },
+                    messages: {
+                        age: {
+                            maxlength: "Das Alter darf nicht mehr als zwei Zeichen enthalten"
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $("#submitfulllead").click(function() {
+                    if($("#optionalForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                
                 // Prepare the popups
                 $("#submitsuccess").enhanceWithin().popup();
                 $("#submitfailure").enhanceWithin().popup();
@@ -1221,6 +1249,9 @@
                             <p></p>
                         </div>
                     </div>
+                    
+                    <span id="errorage"></span>
+                    
                     <div class="ui-grid-c">
                         <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
                             <p style="line-height: 53px margin:0;">Aktuelles Fahrzeug:</p>
@@ -1467,20 +1498,22 @@
                 </form>
             </div>
         </div>
-        
-        <!-- POPUP: ERFOLGSMELDUNG -->
-        <div id="submitsuccess" data-theme="a" class="ui-content">
-            <div data-role="content">
-                <h2>Versand erfolgreich</h2>
-                <p>Die Daten konnten erfolgreich versendet werden.</p>
+        <div data-role="page" id="Popup" data-theme="b">
+
+            <!-- POPUP: ERFOLGSMELDUNG -->
+            <div id="submitsuccess" data-theme="a" class="ui-content">
+                <div data-role="content">
+                    <h2>Versand erfolgreich</h2>
+                    <p>Die Daten konnten erfolgreich versendet werden.</p>
+                </div>
             </div>
-        </div>
-            
-        <!-- POPUP: FEHLERMELDUNG -->
-        <div id="submitfailure" data-theme="a" class="ui-content">
-            <div data-role="content">
-                <h2>Versand fehlgeschlagen</h2>
-                <p>Beim Versand gab es ein Problem. Die Anfrage wurde allerdings gespeichert und kann später übermittelt werden.</p>
+                
+            <!-- POPUP: FEHLERMELDUNG -->
+            <div id="submitfailure" data-theme="a" class="ui-content">
+                <div data-role="content">
+                    <h2>Versand zurückgestellt (Offline)</h2>
+                    <p>Beim Versand gab es ein Problem. Die Anfrage wurde allerdings gespeichert und kann später übermittelt werden.</p>
+                </div>
             </div>
         </div>
     </body>
