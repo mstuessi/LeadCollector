@@ -50,6 +50,9 @@
                         brand: {
                             required: true,
                             focusInvalid: false
+                        },
+                        collector: {
+                            required: true
                         }
                     },
                     messages: {
@@ -58,7 +61,11 @@
                         },
                         brand: {
                             required: "Bitte wählen sie die Marke für welche Leads erfasst werden."
+                        },
+                        collector: {
+                            required: "Bitte erfassen sie ihren eigenen Namen!"
                         }
+
                     },
                     errorPlacement: function(error, element) {
                         var name = element.attr("name");
@@ -288,7 +295,8 @@
                         // Append the brand and the campaign
                         $("#customerForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
                         $("#customerForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
-                    
+                        $("#customerForm").append('<input type="hidden" name="collector" class="appendedInput" value="' + $("input[name=collector]").val() + '" />');
+                        
                         // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
                         // Get the selected type(s) of the lead
                         $.each($("#vehicleForm").find("input[type=hidden]"), function() {
@@ -361,6 +369,7 @@
                         // Append the brand and the campaign
                         $("#optionalForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
                         $("#optionalForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
+                        $("#customerForm").append('<input type="hidden" name="collector" class="appendedInput" value="' + $("input[name=collector]").val() + '" />');
                     
                         // In order to submit the values from all input masks, we need to append the information from the other forms to the current form.
                         // Get the selected type(s) of the lead
@@ -762,6 +771,12 @@
                         </div>
                         <span id="errorcampaigncode" ></span>
                     </div>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a"><input type="text" name="collector" id="collector" value="" placeholder="Erfassende Person" autocapitalize="off" autocorrect="off"></div>
+                    </div>
+                    
+                    <span id="errorcollector" ></span>
                     
                     <div class="ui-grid-solo ui-responsive">
                         <div class="ui-block-a"><a href="#vehicledata" id="continueVehicleData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Mit Auswahl fortfahren</a>
@@ -1208,11 +1223,24 @@
                         <div class="ui-block-a">
                             <div class="ui-field-contain">
                                 <fieldset data-role="controlgroup">
-                                    <legend>Datenschutzbestimmungen</legend>
+                                    <legend><a href="#dsgpopup" data-rel="popup" style="color:black;">Datenschutzbestimmungen</a></legend>
                                     <input type="checkbox" name="conditionsAccepted" id="conditionsAccepted" class="custom" data-mini="true" checked value="true">
                                     <label for="conditionsAccepted">Einverstanden mit der Nutzung der personenbezogenen Daten</label>
                                 </fieldset>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- POPUP: Datenschutztext -->
+                    <div data-role="popup" id="dsgpopup">
+                        <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+                        <h2>Datennutzungserklärung</h2>
+                        <p>Ich bin damit einverstanden, dass meine personenbezogenen Daten zum Zwecke der Interessentenbefragung und Interessenteninformation (z.B. über Produkte, Dienstleistungen und Veranstaltungen der AMAG Automobil- und Motoren AG und ihren Marken) bearbeitet werden. Weiter bin ich damit einverstanden, dass meine Daten der AMAG Automobil- und Motoren AG, Aarauerstrasse 20, 5116 Schinznach-Bad, deren Vertragspartner und/oder an einen autorisierten Dienstleister übermittelt werden. Schliesslich bin ich damit einverstanden, dass mir die AMAG Automobil- und Motoren AG fernmeldetechnisch (z.B. per E-Mail) Informationen und Werbung zu Produkten, Dienstleistungen und Veranstaltungen ihrer Marken sendet. Die Daten werden ausschliesslich in Übereinstimmung mit den schweizerischen Bestimmungen zum Datenschutz verwendet. Insbesondere erfolgt keine Weitergabe von Daten an unbefugte Dritte.</p>
+                    </div>
+                                
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a">
+                            <input type="text" name="salesperson" id="salesperson" value="" placeholder="Verkäufer" autocapitalize="off" autocorrect="off" />
                         </div>
                     </div>
                     
