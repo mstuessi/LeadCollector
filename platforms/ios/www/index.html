@@ -288,7 +288,7 @@
                         });
                     })
                 })
-                
+                              
                 // Submit the lead before the optional information mask
                 $("#submitminimumleadbutton").click(function() {
                     if($("#customerForm").valid()){
@@ -545,6 +545,15 @@
                 $("#startscreen").on("pageshow", function(event, ui) {
                     checkForFailedSubmissions();
                 });
+                $("#vehicledata").on("pageshow", function(event, ui) {
+                    checkForFailedSubmissions();
+                });
+                $("#customerdata").on("pageshow", function(event, ui) {
+                    checkForFailedSubmissions();
+                });
+                $("#optionaldata").on("pageshow", function(event, ui) {
+                    checkForFailedSubmissions();
+                });
             })
             
             // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
@@ -615,10 +624,20 @@
                 readText("failedsubmissions.json", function(textRead) {
                     failedSubmissions = textRead;
                     
+                    var failedSubmissionsSplit = failedSubmissions.split("\n");
+                    var failedSubmissionsNr = failedSubmissionsSplit.length - 1;
+                    
                     if(failedSubmissions.trim() == "") {
                         $("#retransmit").hide();
+                        $("#titelvehicledata").html('Fahrzeug');
+                        $("#titelcustomerdata").html('Interessentendaten');
+                        $("#titeloptionaldata").html('Interessentendaten');
                     } else {
                         $("#retransmit").show();
+                        $("#retransmit").text(failedSubmissionsNr + ' gespeicherte Leads senden');
+                        $("#titelvehicledata").html('Fahrzeug - <a href="#startscreen" id="retransmitvlc" style="color:red;">'+ failedSubmissionsNr +' gespeicherte Leads</a>');
+                        $("#titelcustomerdata").html('Interessentendaten - <a href="#startscreen" id="retransmitvlc" style="color:red;">'+ failedSubmissionsNr +' gespeicherte Leads</a>');
+                        $("#titeloptionaldata").html('Interessentendaten - <a href="#startscreen" id="retransmitvlc" style="color:red;">'+ failedSubmissionsNr +' gespeicherte Leads</a>');
                     }
                 })
                 
@@ -785,7 +804,7 @@
             
                     <div data-role="footer" data-position="fixed">
                         <a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-refresh">Modelle &amp; Kampagnen aktualisieren</a>
-                        <a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right" style="background: #e2001a; color: white;">Fehlgeschlagene Leads versenden</a>
+                        <a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right" style="background: #e2001a; color: white;"></a>
                     </div>
                 </form>
             </div>
@@ -794,11 +813,10 @@
         <!-- FAHRZEUGDATEN -->
         <div data-role="page" id="vehicledata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
-                <h1>Fahrzeug</h1>
+                <h1 id="titelvehicledata">Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                 <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Weiter </a>
             </div>
-            
             <div role="main" class="ui-content">
                 <form id="vehicleForm">
                     <div class="ui-grid-a">
@@ -846,7 +864,7 @@
         <!-- INTERESSENTENDATEN -->
         <div data-role="page" id="customerdata" data-theme="b">
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
-                <h1>Interessentendaten</h1>
+                <h1 id="titelcustomerdata">Interessentendaten</h1>
                 <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                 <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button">Schritt zurück </a>
             </div>
@@ -1259,7 +1277,7 @@
               <!-- OPTIONALE ANGABEN -->
             <div data-role="page" id="optionaldata" data-theme="b">
                 <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
-                    <h1>Interessentendaten</h1>
+                    <h1 id="titeloptionaldata">Interessentendaten</h1>
                     <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                     <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button ">Schritt zurück </a>
                 </div>
