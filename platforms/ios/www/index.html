@@ -576,7 +576,7 @@
                                 $("#customerResults").empty();
                                
                                 $.each(response, function() {
-                                    $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" result-lang="' + this.lang + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
+                                    $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" data-result-lang="' + this.lang + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
                                 })
 
                                 $("#customerResults").enhanceWithin().controlgroup("refresh");
@@ -604,11 +604,25 @@
                     male = false;
                     female = false;
                     
+                    // Reset the language to false
+                    german = false;
+                    french = false;
+                    italian = false;
+                    
                     // Set the salutation accordingly
                     if($(this).data("resultSalutation") == "1") {
                         male = true;
                     } else if($(this).data("resultSalutation") == "2") {
                         female = true;
+                    }
+                    
+                    // Set the language accordingly
+                    if($(this).data("resultLang") == "1") {
+                        german = true;
+                    } else if($(this).data("resultLang") == "2") {
+                        french = true;
+                    } else if($(this).data("resultLang") == "3") {
+                        italian = true;
                     }
                     
                     // If the customerdata DOM has been initialized already, directly update
@@ -620,8 +634,20 @@
                             $("#f").prop("checked", true);
                         }
                         
+                        if(german) {
+                            $("#de").prop("checked", true);
+                        } else if(french) {
+                            $("#fr").prop("checked", true);
+                        } else if(italian) {
+                            $("#it").prop("checked", true);
+                        }
+                        
                         $("#m").checkboxradio("refresh");
                         $("#f").checkboxradio("refresh");
+                        $("#de").checkboxradio("refresh");
+                        $("#fr").checkboxradio("refresh");
+                        $("#it").checkboxradio("refresh");
+                        $("#en").checkboxradio("refresh");
                     }
                 })
             });
@@ -816,10 +842,23 @@
                         } else if(female) {
                             $("#f").prop("checked", true);
                         }
-                            
-                        // After setting the salutation, refresh to make the change visible
+                        
+                        // Also try to set the language
+                        if(german) {
+                            $("#de").prop("checked", true);
+                        } else if(french) {
+                            $("#fr").prop("checked", true);
+                        } else if(italian) {
+                            $("#it").prop("checked", true);
+                        }
+                        
+                        // Refresh the radio buttons
                         $("#m").checkboxradio("refresh");
                         $("#f").checkboxradio("refresh");
+                        $("#de").checkboxradio("refresh");
+                        $("#fr").checkboxradio("refresh");
+                        $("#it").checkboxradio("refresh");
+                        $("#en").checkboxradio("refresh");
                         
                         customerdataDOMinitialized = true;
                     })
