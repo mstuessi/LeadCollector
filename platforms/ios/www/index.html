@@ -109,7 +109,7 @@
                 });
                 
                 // Prevent continuation if form is invalid
-                $( "#continueCustomerData, #continueCustomerDataShortcut, #continuedynamicsearch" ).click(function() {
+                $( "#continueCustomerData, #continueCustomerDataShortcut, #continuedynamicsearch, #dynamicsearchDataShortcut" ).click(function() {
                     if($("#vehicleForm").valid()){
                         return true;
                     } else {
@@ -810,7 +810,13 @@
             <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
                 <h1 id="titelvehicledata">Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
-                <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Weiter </a>
+                <div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">
+                    <a href="#dynamicsearch" id="dynamicsearchDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-search" data-role="button" role="button"> DynamicSearch
+                    </a>
+                    <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Manuelle Eingabe
+                    </a>
+                </div>
+              
             </div>
             <div role="main" class="ui-content">
                 <form id="vehicleForm">
