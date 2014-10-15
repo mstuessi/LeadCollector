@@ -29,6 +29,9 @@
                 vehicledataDOMinitialized = false;
                 customerdataDOMinitialized = false;
                 
+                //male = false;
+                //female = false;
+                
                 // Init Flipswitches
                 $("#countrySwitch").flipswitch({
                     onText: "Nein",
@@ -427,6 +430,10 @@
                         $("#customerForm")[0].reset();
                         $("#vehicleForm")[0].reset();
                         $("#optionalForm")[0].reset();
+                        $("#dynamicsearchForm")[0].reset();
+                        
+                        // Remove Dynamic Search results
+                        $("#customerResults").empty();
                     
                         // The hidden inputs won't be reseted for some reason, so clear them manually
                         $("input[name=testdrive]").val("false");
@@ -549,7 +556,75 @@
                 $("#vehicledata").on("pageshow", function(event, ui) {
                     checkForFailedSubmissions();
                 });
-            })
+                
+                $("#searchPhone").keyup(function()  {
+                    if ($('#searchPhone').val().length > 5) {
+                        alert("request over tel");
+                    }
+                });
+                    
+                $("#searchName, #searchSurname, #searchZIP, #searchCity, #searchCanton").keyup(function()  {
+                    totallength = $("#searchName").val().length + $("#searchSurname").val().length + $("#searchZIP").val().length + $("#searchCity").val().length + $("#searchCanton").val().length;
+                    
+                    if (totallength>5) {
+                        $.ajax({
+                            type: "POST",
+                            data: $("#dynamicsearchForm").serialize(),
+                            timeout: 1000,
+                            url: "http://172.16.99.200:8080/leadcollector/customersearch",
+                            success: function(response) {
+                                $("#customerResults").empty();
+                               
+                                $.each(response, function() {
+                                    $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" result-lang="' + this.lang + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
+                                })
+
+                                $("#customerResults").enhanceWithin().controlgroup("refresh");
+                            },
+                            error: function(response) {
+                    
+                            }
+                        });
+
+                    }
+                    else if ($('#searchPhone').val().length == 0) {
+                        $("#customerResults").empty();
+                    }
+                });
+                
+                $("#dynamicsearchForm").on("click", ".customerResult", function(event, ui) {
+                    $("#name").val($(this).data("resultName"));
+                    $("#surname").val($(this).data("resultSurname"));
+                    $("#address").val($(this).data("resultAddress"));
+                    $("#houseNumber").val($(this).data("resultHouseNumber"));
+                    $("#zip").val($(this).data("resultZip"));
+                    $("#city").val($(this).data("resultCity"));
+                    
+                    // Reset the salutation to false
+                    male = false;
+                    female = false;
+                    
+                    // Set the salutation accordingly
+                    if($(this).data("resultSalutation") == "1") {
+                        male = true;
+                    } else if($(this).data("resultSalutation") == "2") {
+                        female = true;
+                    }
+                    
+                    // If the customerdata DOM has been initialized already, directly update
+                    // If it wasn't, don't do anything - the method
+                    if(customerdataDOMinitialized) {
+                        if(male) {
+                            $("#m").prop("checked", true);
+                        } else if(female) {
+                            $("#f").prop("checked", true);
+                        }
+                        
+                        $("#m").checkboxradio("refresh");
+                        $("#f").checkboxradio("refresh");
+                    }
+                })
+            });
             
             // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
             function updateCampaigns(campaigns) {
@@ -734,6 +809,18 @@
                 } else {
                     $(document).one("pageshow", "#customerdata", function(event) {
                         setBrandDealers(brand);
+                        
+                        // If there was a dynamic search, try to set the salutation
+                        if(male) {
+                            $("#m").prop("checked", true);
+                        } else if(female) {
+                            $("#f").prop("checked", true);
+                        }
+                            
+                        // After setting the salutation, refresh to make the change visible
+                        $("#m").checkboxradio("refresh");
+                        $("#f").checkboxradio("refresh");
+                        
                         customerdataDOMinitialized = true;
                     })
                 }
@@ -811,7 +898,7 @@
                 <h1 id="titelvehicledata">Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                 <div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">
-                    <a href="#dynamicsearch" id="dynamicsearchDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-search" data-role="button" role="button"> DynamicSearch
+                    <a href="#dynamicsearch" id="dynamicsearchDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-search" data-role="button" role="button"> DynamicSearch&trade;
                     </a>
                     <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Manuelle Eingabe
                     </a>
@@ -853,14 +940,12 @@
                         </div>
                     </div>
                     
-                    <div class="ui-grid-solo">
+                    <div class="ui-grid-a">
                         <div class="ui-block-a">
-                            <a href="#customerdata"  id="continueCustomerData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Interessentendaten</a>
+                            <a href="#dynamicsearch"  id="continuedynamicsearch" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-search">DynamicSearch&trade; (Online)</a>
                         </div>
-                    </div>
-                    <div class="ui-grid-solo">
-                        <div class="ui-block-a">
-                            <a href="#dynamicsearch"  id="continuedynamicsearch" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Weiter mit Dynamic Search (gute Netzwerkverbingung zwingend!)</a>
+                        <div class="ui-block-b">
+                            <a href="#customerdata"  id="continueCustomerData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Manuelle Adresseingabe</a>
                         </div>
                     </div>
                     
@@ -1559,32 +1644,45 @@
             <!-- DYNAMIC SEARCH -->
             <div data-role="page" id="dynamicsearch" data-theme="b">
                 <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
-                    <h1 id="titeldynamicsearch">Dynamic Search</h1>
+                    <h1 id="titeldynamicsearch">DynamicSearch&trade;</h1>
                     <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                     <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" data-role="button" role="button ">Normale Eingabe</a>
                 </div>
                 
                 <div role="main" class="ui-content">
                     <form id="dynamicsearchForm">
-                        <div class="ui-grid-a">
-                            <div class="ui-block-a"><input type="text" name="name" id="name" value="" placeholder="Vorname" autocapitalize="on" autocorrect="off"></div>
-                            <div class="ui-block-b"><input type="text" name="surname" id="surname" value="" placeholder="Nachname" autocapitalize="on" autocorrect="off"></div>
-                        </div>
-                        <div class="ui-grid-b">
-                            <div class="ui-block-a" style="width: 20%;"><input type="text" name="ort" id="name" value="" placeholder="PLZ" autocapitalize="on" autocorrect="off"></div>
-                            <div class="ui-block-b" style="width: 60%;"><input type="text" name="surname" id="surname" value="" placeholder="Ort" autocapitalize="on" autocorrect="off"></div>
-                            <div class="ui-block-c" style="width: 20%;"><input type="text" name="name" id="name" value="" placeholder="Kanton" autocapitalize="on" autocorrect="off"></div>
+                        <div class="ui-grid-c">
+                            <div class="ui-block-a" style="width: 31%;">
+                                <input type="text" name="searchName" id="searchName" value="" placeholder="Vorname" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-b" style="width: 31%;">
+                                <input type="text" name="searchSurname" id="searchSurname" value="" placeholder="Nachname" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-c" style="width: 7%; line-height: 53px; text-align:center;">
+                                <b>oder</b>
+                            </div>
+                            <div class="ui-block-d" style="width: 31%;">
+                                <input type="number" name="searchPhone" id="searchPhone" value="" placeholder="Telefon-Nr. 012 234 56 78" autocapitalize="on" autocorrect="off">
+                            </div>
                         </div>
                         
-                        Anklicken zum übernehmen:
-                        <div data-role="controlgroup">
-                            <a href="#" class="ui-btn ui-corner-all">Resultat 1</a>
-                            <a href="#" class="ui-btn ui-corner-all">Resultat 2</a>
-                            <a href="#" class="ui-btn ui-corner-all">Resultat 3</a>
-                            <a href="#" class="ui-btn ui-corner-all">Resultat 4</a>
-                            <a href="#" class="ui-btn ui-corner-all">Resultat 5</a>
+                        <div class="ui-grid-c">
+                            <div class="ui-block-a" style="width: 11%;">
+                                <input type="text" name="searchZIP" id="searchZIP" value="" placeholder="PLZ" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-b" style="width: 40%;">
+                                <input type="text" name="searchCity" id="searchCity" value="" placeholder="Ort" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-c" style="width: 11%;">
+                                <input type="text" name="searchCanton" id="searchCanton" value="" placeholder="Kanton" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-d" style="width: 38%;" id="errordynamic">
+                            </div>
                         </div>
-                    
+                 
+                        <div data-role="controlgroup" id="customerResults">
+                            <!-- Customer results will be displayed here -->
+                        </div>
                     </form>
                 </div>
             </div>
