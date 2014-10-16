@@ -559,7 +559,29 @@
                 
                 $("#searchPhone").keyup(function()  {
                     if ($('#searchPhone').val().length > 5) {
-                        alert("request over tel");
+                        $.ajax({
+                            type: "POST",
+                            data: {
+                                searchphone:$('#searchPhone').val()
+                            },
+                            timeout: 1000,
+                            url: "http://s1100pws428.amag.car.web/leadcollector/customerphonesearch",
+                            success: function(response) {
+                                $("#customerResults").empty();
+                               
+                                $.each(response, function() {
+                                    if (this.phone.charAt(0)=="*") {
+                                        this.phone = this.phone.substr(1);
+                                    }
+                                    $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" data-result-lang="' + this.lang + '" data-result-phone="' + this.phone + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
+                                })
+
+                                $("#customerResults").enhanceWithin().controlgroup("refresh");
+                            },
+                            error: function(response) {
+                            
+                            }
+                        });
                     }
                 });
                     
@@ -579,8 +601,6 @@
                                     if (this.phone.charAt(0)=="*") {
                                         this.phone = this.phone.substr(1);
                                     }
-                                
-                                
                                     $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" data-result-lang="' + this.lang + '" data-result-phone="' + this.phone + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
                                 })
 
