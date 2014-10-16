@@ -343,24 +343,8 @@
                             }
                         });
                     
-                        // Now remove the appended inputs so they don't mix up with the next lead
-                        $(".appendedInput").remove();
-                    
-                        // Reset all forms
-                        $("#customerForm")[0].reset();
-                        $("#vehicleForm")[0].reset();
-                        $("#optionalForm")[0].reset();
-                    
-                        // The hidden inputs won't be reseted for some reason, so clear them manually
-                        $("input[name=testdrive]").val("false");
-                        $("input[name=orderbrochures]").val("false");
-                    
-                        // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
-                        // After the lead has been submitted, this must be reseted, so the next customer can change the value
-                        $("#country").removeAttr("readonly");
-                        $("#dealer").removeAttr("readonly");
-                        $("#currentBrand").removeAttr("readonly");
-                        $("#selectedDealer").val("");
+                        resetForms();
+                        
                     } else {
                         return false;
                     }
@@ -423,28 +407,8 @@
                             }
                         });
                     
-                        // Now remove the appended inputs so they don't mix up with the next lead
-                        $(".appendedInput").remove();
-                    
-                        // Reset all forms
-                        $("#customerForm")[0].reset();
-                        $("#vehicleForm")[0].reset();
-                        $("#optionalForm")[0].reset();
-                        $("#dynamicsearchForm")[0].reset();
+                        resetForms();
                         
-                        // Remove Dynamic Search results
-                        $("#customerResults").empty();
-                    
-                        // The hidden inputs won't be reseted for some reason, so clear them manually
-                        $("input[name=testdrive]").val("false");
-                        $("input[name=orderbrochures]").val("false");
-                    
-                        // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
-                        // After the lead has been submitted, this must be reseted, so the next customer can change the value
-                        $("#country").removeAttr("readonly");
-                        $("#dealer").removeAttr("readonly");
-                        $("#currentBrand").removeAttr("readonly");
-                        $("#selectedDealer").val("");
                     } else {
                         return false;
                     }
@@ -556,6 +520,12 @@
                 $("#vehicledata").on("pageshow", function(event, ui) {
                     checkForFailedSubmissions();
                 });
+                
+                // Reset all Forms by clicking New Customer button
+                $("#resetfornewcustomer").click(function() {
+                    resetForms();
+                });
+
                 
                 $("#searchPhone").keyup(function()  {
                     totallength = $("#searchName").val().length + $("#searchSurname").val().length + $("#searchZIP").val().length + $("#searchCity").val().length + $("#searchCanton").val().length;
@@ -931,6 +901,29 @@
                     $("#dealers").enhanceWithin().controlgroup("refresh");
                 })
             }
+        
+            // Resets all Forms for new Customer
+            function resetForms() {
+            // Now remove the appended inputs so they don't mix up with the next lead
+                        $(".appendedInput").remove();
+                    
+                        // Reset all forms
+                        $("#customerForm")[0].reset();
+                        $("#vehicleForm")[0].reset();
+                        $("#optionalForm")[0].reset();
+                    
+                        // The hidden inputs won't be reseted for some reason, so clear them manually
+                        $("input[name=testdrive]").val("false");
+                        $("input[name=orderbrochures]").val("false");
+                    
+                        // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
+                        // After the lead has been submitted, this must be reseted, so the next customer can change the value
+                        $("#country").removeAttr("readonly");
+                        $("#dealer").removeAttr("readonly");
+                        $("#currentBrand").removeAttr("readonly");
+                        $("#selectedDealer").val("");
+
+            }
         </script>
     </head>
     <body>
@@ -998,8 +991,9 @@
             </div>
             <div role="main" class="ui-content">
                 <form id="vehicleForm">
-                    <div class="ui-grid-a">
-                        <div class="ui-block-a" style="width: 30%; margin-left:20px;">
+                    <div class="ui-grid-c">
+                    <div class="ui-block-a" style="width: 1%;"> </div>
+                        <div class="ui-block-b" style="width: 29%;">
                             <fieldset data-role="controlgroup" data-type="horizontal">
                                 <input type="checkbox" id="testdrive" class="type" name="leadactiontyp">
                                 <label for="testdrive">Probefahrt</label>
@@ -1007,11 +1001,15 @@
                                 <label for="orderbrochures">Prospekte</label>
                             </fieldset>
                         </div>
-                        <div class="ui-block-b" style="width: 35%; line-height: 60px;">
-                        <span id="errorleadactiontyp"></span>
-                        </div>
+                        <div class="ui-block-c" style="width: 69%">
+                           <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: right">
+                                <a href="#resetfornewcustomer"  id="resetfornewcustomer" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete">Zurücksetzten (neuer Kunde)</a>
+                            </fieldset>
+                       </div>
+                       <div class="ui-block-d" style="width: 1%;"> </div>
                     </div>
                     
+                    <span id="errorleadactiontyp"></span>
                     <span id="errorvlcoptions"></span>
                     
                     <div class="ui-grid-a">
