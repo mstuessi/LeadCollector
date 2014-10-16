@@ -558,17 +558,24 @@
                 });
                 
                 $("#searchPhone").keyup(function()  {
+                    totallength = $("#searchName").val().length + $("#searchSurname").val().length + $("#searchZIP").val().length + $("#searchCity").val().length + $("#searchCanton").val().length;
+                   
                     if ($('#searchPhone').val().length > 5) {
                         $.ajax({
                             type: "POST",
                             data: {
-                                searchphone:$('#searchPhone').val()
+                                searchPhone:$('#searchPhone').val()
                             },
                             timeout: 1000,
                             url: "http://s1100pws428.amag.car.web/leadcollector/customerphonesearch",
                             success: function(response) {
                                 $("#customerResults").empty();
-                               
+                                $('#errordynamic').html("");
+                                $('#dynamicinfo').html("");
+                                if (response=="") {
+                                    $('#errordynamic').html("");
+                                    $('#dynamicinfo').html("Leider kein Treffer...");
+                                }
                                 $.each(response, function() {
                                     if (this.phone.charAt(0)=="*") {
                                         this.phone = this.phone.substr(1);
@@ -579,24 +586,38 @@
                                 $("#customerResults").enhanceWithin().controlgroup("refresh");
                             },
                             error: function(response) {
-                            
+                                $("#customerResults").empty();
+                                $('#errordynamic').html("");
+                                $('#errordynamic').html("Anfrage fehlgeschlagen (Netzwerk)");
                             }
                         });
+                    }
+                    else if (totallength<5) {
+                        $("#customerResults").empty();
+                        $('#errordynamic').html("");
+                        $('#dynamicinfo').html("Suche ab 6 Zeichen...");
                     }
                 });
                     
                 $("#searchName, #searchSurname, #searchZIP, #searchCity, #searchCanton").keyup(function()  {
                     totallength = $("#searchName").val().length + $("#searchSurname").val().length + $("#searchZIP").val().length + $("#searchCity").val().length + $("#searchCanton").val().length;
                     
+                    
                     if (totallength>5) {
+                        $('#dynamicinfo').html("");
                         $.ajax({
                             type: "POST",
                             data: $("#dynamicsearchForm").serialize(),
                             timeout: 1000,
-                            url: "http://172.16.99.200:8080/leadcollector/customersearch",
+                            url: "http://s1100pws428.amag.car.web/leadcollector/customersearch",
                             success: function(response) {
                                 $("#customerResults").empty();
-                               
+                                $('#errordynamic').html("");
+                                $('#dynamicinfo').html("");
+                                if (response=="") {
+                                    $('#errordynamic').html("");
+                                    $('#dynamicinfo').html("Leider kein Treffer...");
+                                }
                                 $.each(response, function() {
                                     if (this.phone.charAt(0)=="*") {
                                         this.phone = this.phone.substr(1);
@@ -607,13 +628,17 @@
                                 $("#customerResults").enhanceWithin().controlgroup("refresh");
                             },
                             error: function(response) {
-                    
+                                $("#customerResults").empty();
+                                $('#errordynamic').html("");
+                                $('#errordynamic').html("Anfrage fehlgeschlagen (Netzwerk)");
                             }
                         });
 
                     }
                     else if ($('#searchPhone').val().length == 0) {
                         $("#customerResults").empty();
+                        $('#errordynamic').html("");
+                        $('#dynamicinfo').html("Suche ab 6 Zeichen...");
                     }
                 });
                 
@@ -1742,7 +1767,8 @@
                             <div class="ui-block-c" style="width: 11%;">
                                 <input type="text" name="searchCanton" id="searchCanton" value="" placeholder="Kanton" autocapitalize="on" autocorrect="off">
                             </div>
-                            <div class="ui-block-d" style="width: 38%;" id="errordynamic">
+                            <div class="ui-block-d" style="width: 38%; line-height: 53px; text-align:center;">
+                            <span id="dynamicinfo">Suche ab 6 Zeichen...</span><b><span id="errordynamic" class="error" style="color:red"></span></b>
                             </div>
                         </div>
                  
