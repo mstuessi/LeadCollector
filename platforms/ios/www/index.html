@@ -987,7 +987,6 @@
                     <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Manuelle Eingabe
                     </a>
                 </div>
-              
             </div>
             <div role="main" class="ui-content">
                 <form id="vehicleForm">
@@ -1003,7 +1002,7 @@
                         </div>
                         <div class="ui-block-c" style="width: 69%">
                            <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: right">
-                                <a href="#resetfornewcustomer"  id="resetfornewcustomer" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete">Zurücksetzten (neuer Kunde)</a>
+                                <a href="#ConfirmReset"  id="confirmresetlink" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete" data-rel="popup" data-position-to="window">Zurücksetzten (neuer Kunde)</a>
                             </fieldset>
                        </div>
                        <div class="ui-block-d" style="width: 1%;"> </div>
@@ -1042,6 +1041,27 @@
                         <input type="hidden" name="orderbrochures" value="false">
                     </div>
                 </form>
+                <div data-role="popup" id="ConfirmReset" data-overlay-theme="b" data-theme="b" style="width:400px;" class="ui-corner-all ui-popup ui-body-a ui-overlay-shadow">
+                    <div data-role="header" data-theme="a" class="ui-corner-top ui-header ui-bar-a" role="banner">
+                        <h1 class="ui-title" role="heading" aria-level="1">Zurücksetzten..</h1>
+                    </div>
+                    <div role="main" class="ui-corner-bottom ui-content">
+                        <h3 class="ui-title">Alle Eingaben löschen?</h3>
+                        Es werden alle Formulare geleert und kein Lead übertragen. Damit sind sie bereit für einen neuen Kunden.
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">
+                                <a href="#vehicledata" data-role="button" id="resetfornewcustomer" class="ui-btn ui-corner-all ui-btn-icon-right" role="button">Ja</a>
+                            </div>
+                            <div class="ui-block-b">
+                                <a href="#vehicledata" data-role="button" id="donoting" class="ui-btn ui-corner-all ui-btn-icon-right" role="button">Nein!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                
             </div>
         </div>
         
@@ -1794,6 +1814,6 @@
                     <p>Beim Versand gab es ein Problem. Die Anfrage wurde allerdings gespeichert und kann später übermittelt werden.</p>
                 </div>
             </div>
-        </div>
+      </div>
     </body>
 </html>
