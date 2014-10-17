@@ -557,7 +557,7 @@
                             },
                             error: function(response) {
                                 $("#customerResults").empty();
-                                $('#errordynamic').html("");
+                                $('#dynamicinfo').html("");
                                 $('#errordynamic').html("Anfrage fehlgeschlagen (Netzwerk)");
                             }
                         });
@@ -599,7 +599,7 @@
                             },
                             error: function(response) {
                                 $("#customerResults").empty();
-                                $('#errordynamic').html("");
+                                $('#dynamicinfo').html("");
                                 $('#errordynamic').html("Anfrage fehlgeschlagen (Netzwerk)");
                             }
                         });
@@ -982,7 +982,7 @@
                 <h1 id="titelvehicledata">Fahrzeug</h1>
                 <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                 <div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">
-                    <a href="#dynamicsearch" id="dynamicsearchDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-search" data-role="button" role="button"> DynamicSearch&trade;
+                    <a href="#dynamicsearch" id="dynamicsearchDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-search" data-role="button" role="button"> DynamicSearch
                     </a>
                     <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Manuelle Eingabe
                     </a>
@@ -1030,7 +1030,7 @@
                     
                     <div class="ui-grid-a">
                         <div class="ui-block-a">
-                            <a href="#dynamicsearch"  id="continuedynamicsearch" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-search">DynamicSearch&trade; (Online)</a>
+                            <a href="#dynamicsearch"  id="continuedynamicsearch" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-search">DynamicSearch (Online)</a>
                         </div>
                         <div class="ui-block-b">
                             <a href="#customerdata"  id="continueCustomerData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Manuelle Adresseingabe</a>
@@ -1753,7 +1753,7 @@
             <!-- DYNAMIC SEARCH -->
             <div data-role="page" id="dynamicsearch" data-theme="b">
                 <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
-                    <h1 id="titeldynamicsearch">DynamicSearch&trade;</h1>
+                    <h1 id="titeldynamicsearch">DynamicSearch</h1>
                     <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
                     <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" data-role="button" role="button ">Normale Eingabe</a>
                 </div>
