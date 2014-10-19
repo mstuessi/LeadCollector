@@ -721,7 +721,7 @@
                 $("#vehicleselection").controlgroup("container").empty();
                 
                 $.each(selectedBrand, function() {
-                    $("#vehicleselection").controlgroup("container").append('<label for="' + this.code + '"><input type="checkbox" name="vlcoptions" id="' + this.code + '" value="' + this.code + '" />'+ this.name + '</label>');
+                    $("#vehicleselection").controlgroup("container").append('<label for="option_' + this.code + '"><input type="checkbox" name="vlcoptions" id="option_' + this.code + '" value=option_"' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 $("#vehicleselection").enhanceWithin().controlgroup("refresh");
@@ -731,7 +731,7 @@
                 $("#vehicleselectionaccessory").controlgroup("container").empty();
                 
                 $.each(selectedBrandaccessory, function() {
-                    $("#vehicleselectionaccessory").controlgroup("container").append('<label for="' + this.code + '"><input type="checkbox" name="vlcoptions" id="' + this.code + '" value="' + this.code + '" />'+ this.name + '</label>');
+                    $("#vehicleselectionaccessory").controlgroup("container").append('<label for="option_' + this.code + '"><input type="checkbox" name="vlcoptions" id="option_' + this.code + '" value="option_' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 $("#vehicleselectionaccessory").enhanceWithin().controlgroup("refresh");
@@ -775,7 +775,7 @@
                         type: "GET",
                         dataType: "json",
                         async: false,
-                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model&lang=de",
+                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model",
                         timeout: 1000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
@@ -796,7 +796,7 @@
                         type: "GET",
                         dataType: "json",
                         async: false,
-                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=accessory&lang=de",
+                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=accessory",
                         timeout: 1000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
