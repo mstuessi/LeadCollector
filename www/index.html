@@ -534,7 +534,8 @@
                         $.ajax({
                             type: "POST",
                             data: {
-                                searchPhone:$('#searchPhone').val()
+                                searchPhone:$('#searchPhone').val(),
+                                authenticationToken: "Abcd1234"
                             },
                             timeout: 1000,
                             url: "http://s1100pws428.amag.car.web/leadcollector/customerphonesearch",
@@ -577,7 +578,7 @@
                         $('#dynamicinfo').html("");
                         $.ajax({
                             type: "POST",
-                            data: $("#dynamicsearchForm").serialize(),
+                            data: $("#dynamicsearchForm").serialize() + "&authenticationToken=Abcd1234",
                             timeout: 1000,
                             url: "http://s1100pws428.amag.car.web/leadcollector/customersearch",
                             success: function(response) {
