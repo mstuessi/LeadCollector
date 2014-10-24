@@ -673,6 +673,30 @@
                         $("#en").checkboxradio("refresh");
                     }
                 })
+
+                // Trigger submit procedure if enter was hit
+                $("#collector").keypress(function(e) {
+                    if(e.which == 13) {
+                        e.preventDefault();
+                        $("#continueVehicleData").trigger("click");
+                    }
+                })
+
+                // Trigger submit procedure if enter was hit
+                $("#customerdata input").keypress(function(e) {
+                    if(e.which == 13) {
+                        e.preventDefault();
+                        $("#submitminimumleadbutton").trigger("click");
+                    }
+                })
+                
+                // Trigger submit procedure if enter was hit
+                $("#optionaldata input").keypress(function(e) {
+                    if(e.which == 13) {
+                        e.preventDefault();
+                        $("#submitfulllead").trigger("click");
+                    }
+                })
             });
             
             // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
@@ -722,7 +746,7 @@
                 $("#vehicleselection").controlgroup("container").empty();
                 
                 $.each(selectedBrand, function() {
-                    $("#vehicleselection").controlgroup("container").append('<label for="option_' + this.code + '"><input type="checkbox" name="vlcoptions" id="option_' + this.code + '" value=option_"' + this.code + '" />'+ this.label_de + '</label>');
+                    $("#vehicleselection").controlgroup("container").append('<label for="option_' + this.code + '"><input type="checkbox" name="vlcoptions" id="option_' + this.code + '" value="option_' + this.code + '" />'+ this.label_de + '</label>');
                 })
                 
                 $("#vehicleselection").enhanceWithin().controlgroup("refresh");
