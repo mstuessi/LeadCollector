@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        
+        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.2.css" />
+        <link rel="stylesheet" href="css/Marken_neutral_AMAG.css" />
+        <link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
+        <link rel="stylesheet" href="css/error.css" />
+
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/fileapi.js"></script>
+        <script type="text/javascript" src="js/jquery-2.1.1.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.2.js"></script>
+        <script type="text/javascript" src="js/jquery.validate.js"></script>
+        
+        <title>AMAG Leaderfassung</title>
+        
+        <script type="text/javascript">
+            // Command to quick read the file through the console
+            // readText("vw.json", function(textRead){console.log(textRead);});
+            $(document).ready(function() {
+                // This attribute defines whether the DOM of the vehicledata page has been initialized
+                vehicledataDOMinitialized = false;
+                customerdataDOMinitialized = false;
+                
+                //male = false;
+                //female = false;
+                
+                // Init Flipswitches
+                $("#countrySwitch").flipswitch({
+                    onText: "Nein",
+                    offText: "Ja"
+                });
+                
+                $("#dealerSwitch").flipswitch({
+                    onText: "Ja",
+                    offText: "Nein"
+                });
+                
+                // Define the rules for the general data form
+                $("#generalForm").validate({
+                    rules: {
+                        campaigncode: {
+                            required: true,
+                            focusInvalid: false
+                        },
+                        brand: {
+                            required: true,
+                            focusInvalid: false
+                        },
+                        collector: {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        campaigncode: {
+                            required: "Bitte wählen sie den Kampagnencode der aktuellen Messe aus."
+                        },
+                        brand: {
+                            required: "Bitte wählen sie die Marke für welche Leads erfasst werden."
+                        },
+                        collector: {
+                            required: "Bitte erfassen sie ihren eigenen Namen!"
+                        }
+
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $("#continueVehicleData").click(function() {
+                    if($("#generalForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                
+                // Define the rules for the vehicle data form
+                $("#vehicleForm").validate({
+                    rules: {
+                        leadactiontyp: {
+                            required: true,
+                            focusInvalid: false
+                        },
+                        vlcoptions: {
+                            required: true,
+                            focusInvalid: false
+                        }
+                    },
+                    messages: {
+                        leadactiontyp: {
+                            required: "Bitte mindestens eine Aktion anwählen."
+                        },
+                        vlcoptions: {
+                            required: "Bitte mindestens einen Prospekt/Modell anwählen."
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $( "#continueCustomerData, #continueCustomerDataShortcut, #continuedynamicsearch, #dynamicsearchDataShortcut" ).click(function() {
+                    if($("#vehicleForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                              
+                // Define the rules for the customer data form
+                $("#customerForm").validate({
+                    rules: {
+                        salutation: {
+                            required: true
+                        },
+                        lang: {
+                            required: true
+                        },
+                        name: {
+                            required: true
+                        },
+                        surname: {
+                            required: true
+                        },
+                        address: {
+                            required: true
+                        },
+                        houseNumber: {
+                            required: true
+                        },
+                        city: {
+                            required: true
+                        },
+                        zip: {
+                            required: true
+                        },
+                        phone: {
+                            required: function(element) {
+                                return $("#mail").val() == "";
+                            }
+                        },
+                        mail: {
+                            email: true
+                        }
+                    },
+                    messages: {
+                        salutation: {
+                            required: "Bitte eine Anrede wählen."
+                        },
+                        lang: {
+                            required: "Bitte Kundensprache auswählen."
+                        },
+                        name: {
+                            required: "Bitte Vornamen angeben."
+                        },
+                        surname: {
+                            required: "Bitte Nachname angeben."
+                        },
+                        address: {
+                            required: "Strassenname wird benötigt."
+                        },
+                        houseNumber: {
+                            required: "Hausnummer wird benötigt."
+                        },
+                        city: {
+                            required: "Ortschaft wird benötigt."
+                        },
+                        zip: {
+                            required: "Postleitzahl wird benötigt."
+                        },
+                        phone: {
+                            required: "Bitte Telefonnummer oder E-Mailadresse aufnehmen."
+                        },
+                        mail: {
+                            email: "Kein gültiges Format für eine Mailadresse."
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $("#optionalinformation").click(function() {
+                    if($("#customerForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                
+                
+                // Define the rules for the optionaldata data form
+                $("#optionalForm").validate({
+                    rules: {
+                        age: {
+                            maxlength: 2
+                        }
+                    },
+                    messages: {
+                        age: {
+                            maxlength: "Das Alter darf nicht mehr als zwei Zeichen enthalten"
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        var name = element.attr("name");
+                        $("#error" + name).append(error);
+                    }
+                });
+                
+                // Prevent continuation if form is invalid
+                $("#submitfulllead").click(function() {
+                    if($("#optionalForm").valid()){
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                
+                // Prepare the popups
+                $("#submitsuccess").enhanceWithin().popup();
+                $("#submitfailure").enhanceWithin().popup();
+                $("#submitsuccess, #submitfailure").bind({
+                    popupafterclose: function(event, ui) {
+                        $.mobile.navigate("#vehicledata");
+                    }
+                });
+                
+                // Update the campaigns and vehicle information if the button was clicked
+                $("#updatevalues").click(function() {
+                    downloadCampaigns();
+                    updateAllModels();
+                    checkForFailedSubmissions();
+                });
+                
+                // Disable the retransmit button
+                $("#retransmit").hide();
+                
+                // Check if there are failed submissions
+                // Load some common data
+                // Calling the function without the eventlistener wouldn't have any effect, probably because the fileapi.js is not ready at this point
+                document.addEventListener("deviceready", function(){
+                    checkForFailedSubmissions();
+                    downloadCampaigns();
+                    updateAllModels();
+                    initializeDealers();
+                }, false);
+                
+                // If the checkbox for testdrive or orderbrochures was clicked, toggle the value of the hidden input
+                $(".type").click(function() {
+                    if($(this).prop('checked')) {
+                        $("input[name=" + this.id + "]").val("true");
+                    } else {
+                        $("input[name=" + this.id + "]").val("false");
+                    }
+                });
+                
+                // Submit the failed leads
+                $("#retransmit").click(function() {
+                    $.mobile.loading('show', { theme: "b", text: "", textonly: false});
+                    readText("failedsubmissions.json", function(textRead) {
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            data: {
+                                submissions: textRead
+                            },
+                            url: "http://s1100pws428.amag.car.web/leadcollector/failedleadssubmission",
+                            success: function(response) {
+                                saveText("", "failedsubmissions.json", function() {
+                                    checkForFailedSubmissions();
+                                    $.mobile.loading('hide', { theme: "b", text: "", textonly: false});
+                                });
+                            },
+                            error: function(response) {
+                                $.mobile.loading('hide', { theme: "b", text: "", textonly: false});
+                            }
+                        });
+                    })
+                })
+                              
+                // Submit the lead before the optional information mask
+                $("#submitminimumleadbutton").click(function() {
+                    if($("#customerForm").valid()){
+                        // Append the brand and the campaign
+                        $("#customerForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
+                        $("#customerForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
+                        $("#customerForm").append('<input type="hidden" name="collector" class="appendedInput" value="' + $("input[name=collector]").val() + '" />');
+                        
+                        // In order to submit the values from all input masks, we need to append the informations from the other forms to the current form.
+                        // Get the selected type(s) of the lead
+                        $.each($("#vehicleForm").find("input[type=hidden]"), function() {
+                            $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        });
+                    
+                        // Get all checked options
+                        $.each($("#vehicleForm").find("input[type=checkbox]:checked"), function() {
+                            $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        })
+                        
+                        // Get all optional information
+                        // Skip the radio buttons, because this would be all marked as selected this way
+                        $.each($("#optionalForm").find("input[type!=radio]"), function() {
+                            $("#customerForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        })
+                        
+                        // Now get the radio buttons for the intended purchase
+                        $("#customerForm").append($("input[name=intendedPurchase]:checked").clone().attr("type", "hidden").addClass("appendedInput"));
+                    
+                        // Serialize the form and send it to the server
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            data: $("#customerForm").serialize(),
+                            timeout: 3000,
+                            url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
+                            beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                            complete: function() { $.mobile.loading( 'hide')},
+                            success: function(response) {
+                                $("#submitsuccess").popup('open');
+                            },
+                            error: function(response) {
+                                // If submitting the lead failed, write it to a file for later submission
+                                appendText($("#customerForm").serialize() + "\n", "failedsubmissions.json", function() {
+
+                                });
+                           
+                                $("#submitfailure").popup('open');
+                            }
+                        });
+                    
+                        resetForms();
+                        
+                    } else {
+                        return false;
+                    }
+
+                });
+                
+                // Submit the lead from the optional information mask
+                $("#submitfulllead").click(function() {
+                    if($("#optionalForm").valid()){
+                        // Append the brand and the campaign
+                        $("#optionalForm").append('<input type="hidden" name="brand" class="appendedInput" value="' + $("input[name=brand]:checked").val() + '" />');
+                        $("#optionalForm").append('<input type="hidden" name="campaigncode" class="appendedInput" value="' + $("input[name=campaigncode]:checked").val() + '" />');
+                        $("#customerForm").append('<input type="hidden" name="collector" class="appendedInput" value="' + $("input[name=collector]").val() + '" />');
+                    
+                        // In order to submit the values from all input masks, we need to append the information from the other forms to the current form.
+                        // Get the selected type(s) of the lead
+                        $.each($("#vehicleForm").find("input[type=hidden]"), function() {
+                            $("#optionalForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        });
+                    
+                        // Get all checked options
+                        $.each($("#vehicleForm").find("input[type=checkbox]:checked"), function() {
+                            $("#optionalForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        })
+                        
+                        // Get all customer information
+                        // Skip the radio buttons, because this would be all marked as selected this way
+                        $.each($("#customerForm").find("input[type!=radio]"), function() {
+                            $("#optionalForm").append($(this).clone().attr("type", "hidden").addClass("appendedInput"));
+                        })
+                        
+                        // Now get the radio button for the salutation...
+                        $("#optionalForm").append($("input[name=salutation]:checked").clone().attr("type", "hidden").addClass("appendedInput"));
+                        
+                        // ... and the radio button for the language of the customer
+                        $("#optionalForm").append($("input[name=lang]:checked").clone().attr("type", "hidden").addClass("appendedInput"));
+                        
+                        // The remarks are a textarea, so "input" won't select them
+                        $("#optionalForm").append('<input type="hidden" value="' + $("#remarks").val() + '" class="appendedInput" name="remarks" />');
+                    
+                        // Serialize the form and send it to the server
+                        $.ajax({
+                            type: "POST",
+                            async: false,
+                            data: $("#optionalForm").serialize(),
+                            timeout: 3000,
+                            url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
+                            beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                            complete: function() { $.mobile.loading( 'hide')},
+                            success: function(response) {
+                                $("#submitsuccess").popup('open');
+                            },
+                            error: function(response) {
+                                // If submitting the lead failed, write it to a file for later submission
+                                appendText($("#optionalForm").serialize() + "\n", "failedsubmissions.json", function() {
+
+                                });
+                           
+                                $("#submitfailure").popup('open');
+                            }
+                        });
+                    
+                        resetForms();
+                        
+                    } else {
+                        return false;
+                    }
+
+                });
+                
+                // If the brand has been changed, change the models on the vehicledata page
+                // If the DOM of the vehiclepage has not been initialized, create a one time event.
+                // If it already was initialized, immediately update the models
+                // Additionally change the design of the application to the according brand-style
+                $('input[name="brand"]:radio').change(function() {
+                    executeBrandUpdate(this.id);
+                    
+                    if(vehicledataDOMinitialized) {
+                        setModels($('input[name=brand]:checked').val());
+                    } else {
+                        $(document).one("pageshow", "#vehicledata", function(event) {
+                            setModels($('input[name=brand]:checked').val());
+                            vehicledataDOMinitialized = true;
+                        });
+                    }
+                })
+                
+                // Save the selected country
+                $("body").on("click", ".countryoption", function() {
+                    $("#countrySwitch").prop("checked", true);
+                    $("#countrySwitch").flipswitch("refresh");
+                    $("#selectedCountry").val($(this).attr("id"));
+                    $("#country").val($(this).html());
+                    $("#country").attr("data-clear-btn", "true");
+                    $("#country").attr("readonly", "true");
+                    $(".countryoption").addClass("ui-screen-hidden");
+                })
+                
+                // Save the selected dealer
+                $("body").on("click", ".dealeroption", function() {
+                    $("#dealerSwitch").prop("checked", true);
+                    $("#dealerSwitch").flipswitch("refresh");
+                    $("#selectedDealer").val($(this).attr("id").substr(7));
+                    $("#dealer").val($(this).html());
+                    $("#dealer").attr("data-clear-btn", "true");
+                    $("#dealer").attr("readonly", "true");
+                    $(".dealeroption").addClass("ui-screen-hidden");
+                })
+                
+                // Save the selected brand
+                $("body").on("click", ".currentbrandoption", function() {
+                    $("#currentBrand").val($(this).html());
+                    $("#currentBrand").attr("data-clear-btn", "true");
+                    $("#currentBrand").attr("readonly", "true");
+                    $(".currentbrandoption").addClass("ui-screen-hidden");
+                })
+                
+                // Clear the country
+                $("#countrySelection").on("click", ".ui-input-clear", function(e){
+                    $("#countrySwitch").prop("checked", false);
+                    $("#countrySwitch").flipswitch("refresh");
+                    $("#country").removeAttr("readonly");
+                    $("#selectedCountry").val("");
+                    $("#countrySwitch").prop("checked", false);
+                    $("#countrySwitch").flipswitch("refresh");
+                });
+                
+                // Clear the dealer
+                $("#dealerSelection").on("click", ".ui-input-clear", function(e){
+                    $("#dealerSwitch").prop("checked", false);
+                    $("#dealerSwitch").flipswitch("refresh");
+                    $("#dealer").removeAttr("readonly");
+                    $("#selectedDealer").val("");
+                    $("#dealerSwitch").prop("checked", false);
+                    $("#dealerSwitch").flipswitch("refresh");
+                });
+                
+                // Clear the dealer
+                $("#brandSelection").on("click", ".ui-input-clear", function(e){
+                    $("#currentBrand").removeAttr("readonly");
+                });
+                
+                // Focus search field if activated or clear input if disabled
+                $("#countrySwitch").change(function(event) {
+                    if($(this).prop("checked")) {
+                        $("#country").focus();
+                        $("#dealerSwitch").flipswitch("disable");
+                        $("#dealer").textinput("disable");
+                    } else {
+                        $("#country").val("");
+                        $("#countrySelection").find(".ui-input-clear").trigger("click");
+                        $("#countrySelection").trigger("updatelayout");
+                        $("#dealerSwitch").flipswitch("enable");
+                        $("#dealer").textinput("enable");
+                    }
+                })
+
+                // Focus search field if activated or clear input if disabled
+                $("#dealerSwitch").change(function(event) {
+                    if($(this).prop("checked")) {
+                        $("#dealer").focus();
+                    } else {
+                        $("#dealer").val("");
+                        $("#dealerSelection").find(".ui-input-clear").trigger("click");
+                        $("#dealerSelection").trigger("updatelayout");
+                    }
+                })
+                
+                // Always check for failed submissions when the startscreen is loaded
+                $("#startscreen").on("pageshow", function(event, ui) {
+                    checkForFailedSubmissions();
+                });
+                $("#vehicledata").on("pageshow", function(event, ui) {
+                    checkForFailedSubmissions();
+                });
+                
+                // Reset all Forms by clicking New Customer button
+                $("#resetfornewcustomer").click(function() {
+                    resetForms();
+                });
+
+                
+                $("#searchPhone").keyup(function()  {
+                    totallength = $("#searchName").val().length + $("#searchSurname").val().length + $("#searchZIP").val().length + $("#searchCity").val().length + $("#searchCanton").val().length;
+                   
+                    if ($('#searchPhone').val().length > 5) {
+                        $.ajax({
+                            type: "POST",
+                            data: {
+                                searchPhone:$('#searchPhone').val()
+                            },
+                            timeout: 1000,
+                            url: "http://s1100pws428.amag.car.web/leadcollector/customerphonesearch",
+                            success: function(response) {
+                                $("#customerResults").empty();
+                                $('#errordynamic').html("");
+                                $('#dynamicinfo').html("");
+                                if (response=="") {
+                                    $('#errordynamic').html("");
+                                    $('#dynamicinfo').html("Leider kein Treffer...");
+                                }
+                                $.each(response, function() {
+                                    if (this.phone.charAt(0)=="*") {
+                                        this.phone = this.phone.substr(1);
+                                    }
+                                    $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" data-result-lang="' + this.lang + '" data-result-phone="' + this.phone + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
+                                })
+
+                                $("#customerResults").enhanceWithin().controlgroup("refresh");
+                            },
+                            error: function(response) {
+                                $("#customerResults").empty();
+                                $('#dynamicinfo').html("");
+                                $('#errordynamic').html("Anfrage fehlgeschlagen (Netzwerk)");
+                            }
+                        });
+                    }
+                    else if (totallength<5) {
+                        $("#customerResults").empty();
+                        $('#errordynamic').html("");
+                        $('#dynamicinfo').html("Suche ab 6 Zeichen...");
+                    }
+                });
+                    
+                $("#searchName, #searchSurname, #searchZIP, #searchCity, #searchCanton").keyup(function()  {
+                    totallength = $("#searchName").val().length + $("#searchSurname").val().length + $("#searchZIP").val().length + $("#searchCity").val().length + $("#searchCanton").val().length;
+                    
+                    
+                    if (totallength>5) {
+                        $('#dynamicinfo').html("");
+                        $.ajax({
+                            type: "POST",
+                            data: $("#dynamicsearchForm").serialize(),
+                            timeout: 1000,
+                            url: "http://s1100pws428.amag.car.web/leadcollector/customersearch",
+                            success: function(response) {
+                                $("#customerResults").empty();
+                                $('#errordynamic').html("");
+                                $('#dynamicinfo').html("");
+                                if (response=="") {
+                                    $('#errordynamic').html("");
+                                    $('#dynamicinfo').html("Leider kein Treffer...");
+                                }
+                                $.each(response, function() {
+                                    if (this.phone.charAt(0)=="*") {
+                                        this.phone = this.phone.substr(1);
+                                    }
+                                    $("#customerResults").append('<a href="#customerdata" class="ui-btn ui-corner-all customerResult" data-result-name="' + this.name + '" data-result-surname="' + this.surname + '" data-result-address="' + this.address + '" data-result-house-number="' + this.houseNumber + '" data-result-zip="' + this.zip + '" data-result-city="' + this.city + '" data-result-salutation="' + this.salutation + '" data-result-lang="' + this.lang + '" data-result-phone="' + this.phone + '">' + this.name + ' ' + this.surname + ', ' + this.address + ' ' + this.houseNumber + ', ' + this.zip + ' ' + this.city + '</a>');
+                                })
+
+                                $("#customerResults").enhanceWithin().controlgroup("refresh");
+                            },
+                            error: function(response) {
+                                $("#customerResults").empty();
+                                $('#dynamicinfo').html("");
+                                $('#errordynamic').html("Anfrage fehlgeschlagen (Netzwerk)");
+                            }
+                        });
+
+                    }
+                    else if ($('#searchPhone').val().length == 0) {
+                        $("#customerResults").empty();
+                        $('#errordynamic').html("");
+                        $('#dynamicinfo').html("Suche ab 6 Zeichen...");
+                    }
+                });
+                
+                $("#dynamicsearchForm").on("click", ".customerResult", function(event, ui) {
+                    $("#name").val($(this).data("resultName"));
+                    $("#surname").val($(this).data("resultSurname"));
+                    $("#address").val($(this).data("resultAddress"));
+                    $("#houseNumber").val($(this).data("resultHouseNumber"));
+                    $("#zip").val($(this).data("resultZip"));
+                    $("#city").val($(this).data("resultCity"));
+
+                    $("#phone").val($(this).data("resultPhone"));
+                    
+                    // Reset the salutation to false
+                    male = false;
+                    female = false;
+                    
+                    // Reset the language to false
+                    german = false;
+                    french = false;
+                    italian = false;
+                    
+                    // Set the salutation accordingly
+                    if($(this).data("resultSalutation") == "1") {
+                        male = true;
+                    } else if($(this).data("resultSalutation") == "2") {
+                        female = true;
+                    }
+                    
+                    // Set the language accordingly
+                    if($(this).data("resultLang") == "1") {
+                        german = true;
+                    } else if($(this).data("resultLang") == "2") {
+                        french = true;
+                    } else if($(this).data("resultLang") == "3") {
+                        italian = true;
+                    }
+                    
+                    // If the customerdata DOM has been initialized already, directly update
+                    // If it wasn't, don't do anything - the method
+                    if(customerdataDOMinitialized) {
+                        if(male) {
+                            $("#m").prop("checked", true);
+                        } else if(female) {
+                            $("#f").prop("checked", true);
+                        }
+                        
+                        if(german) {
+                            $("#de").prop("checked", true);
+                        } else if(french) {
+                            $("#fr").prop("checked", true);
+                        } else if(italian) {
+                            $("#it").prop("checked", true);
+                        }
+                        
+                        $("#m").checkboxradio("refresh");
+                        $("#f").checkboxradio("refresh");
+                        $("#de").checkboxradio("refresh");
+                        $("#fr").checkboxradio("refresh");
+                        $("#it").checkboxradio("refresh");
+                        $("#en").checkboxradio("refresh");
+                    }
+                })
+            });
+            
+            // This function takes a JSON object and creates a campaign-radio button for each dataset of the object
+            function updateCampaigns(campaigns) {
+                // Delete all existing campaigns
+                $("#campaignselection").controlgroup("container").empty();
+                
+                // Creat the radio buttons
+                $.each(campaigns, function() {
+                    $("#campaignselection").controlgroup("container").append('<label for="' + this.code + '"><input type="radio" name="campaigncode" id="' + this.code + '" value="' + this.code + '" />'+ this.label + '</label>');
+                })
+                
+                // A refresh method has to be called, to make jQuery Mobile aware of the changes
+                $("#campaignselection").enhanceWithin().controlgroup("refresh");
+            }
+        
+            // Download the campaigns
+            function downloadCampaigns() {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "http://s1100pws428.amag.car.web/leadcollector/campaignlist?lang=de",
+                    timeout: 3000,
+                    beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                    complete: function() { $.mobile.loading( 'hide')},
+                    success: function(response) {
+                        // Parse the JSON object as a string so it can be saved into the file
+                        saveText(JSON.stringify(response), "campaigns.json", function() {
+                            // Do something when the file was written?
+                        });
+                       
+                        updateCampaigns(response);
+                    },
+                    error: function(response) {
+                        // If there was an error while getting the campaigns from the server, try to load the campaigns from the local file
+                        readText("campaigns.json", function(textRead) {
+                            var campaigns = jQuery.parseJSON(textRead);
+                            updateCampaigns(campaigns);
+                        })
+                    }
+                })
+            }
+        
+            // Set the vehicles according to the brand
+            function setModels(brand) {
+                selectedBrand = brandsContainer[brand];
+                $("#vehicleselection").controlgroup("container").empty();
+                
+                $.each(selectedBrand, function() {
+                    $("#vehicleselection").controlgroup("container").append('<label for="' + this.code + '"><input type="checkbox" name="vlcoptions" id="' + this.code + '" value="' + this.code + '" />'+ this.name + '</label>');
+                })
+                
+                $("#vehicleselection").enhanceWithin().controlgroup("refresh");
+                
+                selectedBrandaccessory = brandsaccessoryContainer[brand];
+                
+                $("#vehicleselectionaccessory").controlgroup("container").empty();
+                
+                $.each(selectedBrandaccessory, function() {
+                    $("#vehicleselectionaccessory").controlgroup("container").append('<label for="' + this.code + '"><input type="checkbox" name="vlcoptions" id="' + this.code + '" value="' + this.code + '" />'+ this.name + '</label>');
+                })
+                
+                $("#vehicleselectionaccessory").enhanceWithin().controlgroup("refresh");
+            }
+        
+            // This function checks if there still are failed submissions and shows the retransmit button accordingly
+            function checkForFailedSubmissions() {
+                readText("failedsubmissions.json", function(textRead) {
+                    failedSubmissions = textRead;
+                    
+                    var failedSubmissionsSplit = failedSubmissions.split("\n");
+                    var failedSubmissionsNr = failedSubmissionsSplit.length - 1;
+                    
+                    if(failedSubmissions.trim() == "") {
+                        $("#retransmit").hide();
+                        $("#titelvehicledata").html('Fahrzeug');
+                        $("#titelcustomerdata").html('Interessentendaten');
+                        $("#titeloptionaldata").html('Interessentendaten');
+                    } else {
+                        $("#retransmit").show();
+                        $("#retransmit").text(failedSubmissionsNr + ' gespeicherte Leads senden');
+                        $("#titelvehicledata").html('Fahrzeug - <a href="#startscreen" id="retransmitvlc" style="color:red;">'+ failedSubmissionsNr +' gespeicherte Leads</a>');
+                        $("#titelcustomerdata").html('Interessentendaten - <a href="#startscreen" id="retransmitvlc" style="color:red;">'+ failedSubmissionsNr +' gespeicherte Leads</a>');
+                        $("#titeloptionaldata").html('Interessentendaten - <a href="#startscreen" id="retransmitvlc" style="color:red;">'+ failedSubmissionsNr +' gespeicherte Leads</a>');
+                    }
+                })
+                
+                $.mobile.loading('hide');
+            }
+        
+            // Update all models and accessory
+            function updateAllModels() {
+                brandsContainer = new Array();
+                brandsaccessoryContainer = new Array();
+
+                brands = ["vw", "audi", "seat", "skoda", "vwnf"];
+                
+                $.each(brands, function() {
+                    currentIterationBrand = this;
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        async: false,
+                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model&lang=de",
+                        timeout: 1000,
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
+                        success: function(response) {
+                            saveText(JSON.stringify(response), currentIterationBrand + ".json", function() {
+                                // Do something when the file was written?
+                            })
+                       
+                            brandsContainer[currentIterationBrand] = response;
+                        },
+                        error: function(response) {
+                            readBrandModels(currentIterationBrand);
+                           
+                        }
+                    })
+                    
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        async: false,
+                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=accessory&lang=de",
+                        timeout: 1000,
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
+                        success: function(response) {
+                            saveText(JSON.stringify(response), currentIterationBrand + "_accessory.json", function() {
+                                // Do something when the file was written?
+                            })
+                       
+                            brandsaccessoryContainer[currentIterationBrand] = response;
+                        },
+                        error: function(response) {
+                            readBrandAccessory(currentIterationBrand);
+                        }
+                    })
+                })
+            }
+        
+            // Read the models of the brand from the file
+            function readBrandModels(brand) {
+                readText(brand + ".json", function(textRead) {
+                    brandsContainer[brand] = jQuery.parseJSON(textRead);
+                })
+            }
+        
+            // Read the accessory of the brand from the file
+            function readBrandAccessory(brand) {
+                readText(brand + "_accessory.json", function(textRead) {
+                    brandsaccessoryContainer[brand] = jQuery.parseJSON(textRead);
+                })
+            }
+
+            // This method reads the country information and loads the dealers for each brand into a file
+            function initializeDealers() {
+                brands = ["vw", "audi", "seat", "skoda", "vwnf"];
+                $.each(brands, function() {
+                    currentIterationBrand = this;
+                    $.ajax({
+                        type: "GET",
+                        async: false,
+                        dataType: "json",
+                        url: "http://s1100pws428.amag.car.web/leadcollector/dealerlist?brand=" + currentIterationBrand,
+                        timeout: 3000,
+                        beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
+                        complete: function() { $.mobile.loading( 'hide')},
+                        success: function(response) {
+                            saveText(JSON.stringify(response), currentIterationBrand + "dealers.json", function() {
+                                // Do something when the file was written?
+                            })
+                        }
+                    })
+                })
+            }
+        
+            // Begin the dealers update
+            function executeBrandUpdate(brand) {
+                if(customerdataDOMinitialized) {
+                    setBrandDealers(brand);
+                } else {
+                    $(document).one("pageshow", "#customerdata", function(event) {
+                        setBrandDealers(brand);
+                        
+                        // If there was a dynamic search, try to set the salutation
+                        if(male) {
+                            $("#m").prop("checked", true);
+                        } else if(female) {
+                            $("#f").prop("checked", true);
+                        }
+                        
+                        // Also try to set the language
+                        if(german) {
+                            $("#de").prop("checked", true);
+                        } else if(french) {
+                            $("#fr").prop("checked", true);
+                        } else if(italian) {
+                            $("#it").prop("checked", true);
+                        }
+                        
+                        // Refresh the radio buttons
+                        $("#m").checkboxradio("refresh");
+                        $("#f").checkboxradio("refresh");
+                        $("#de").checkboxradio("refresh");
+                        $("#fr").checkboxradio("refresh");
+                        $("#it").checkboxradio("refresh");
+                        $("#en").checkboxradio("refresh");
+                        
+                        customerdataDOMinitialized = true;
+                    })
+                }
+            }
+        
+            // Set the dealers
+            function setBrandDealers(brand) {
+                readText(brand + "dealers.json", function(textRead) {
+                    dealers = jQuery.parseJSON(textRead);
+                    $("#dealers").controlgroup().empty();
+                    // Create the radio buttons
+                    $.each(dealers, function() {
+                        $("#dealers").controlgroup().append('<a href="#" class="dealeroption ui-screen-hidden" data-role="button" id="dealer_' + this.dealer + '">' + this.dealername + ', ' + this.zip + ' ' + this.city + ', (' + this.dealer + ')</a>');
+                    });
+                    
+                    // A refresh method has to be called, to make jQuery Mobile aware of the changes
+                    $("#dealers").enhanceWithin().controlgroup("refresh");
+                })
+            }
+        
+            // Resets all Forms for new Customer
+            function resetForms() {
+            // Now remove the appended inputs so they don't mix up with the next lead
+                        $(".appendedInput").remove();
+                    
+                        // Reset all forms
+                        $("#customerForm")[0].reset();
+                        $("#vehicleForm")[0].reset();
+                        $("#optionalForm")[0].reset();
+                    
+                        // The hidden inputs won't be reseted for some reason, so clear them manually
+                        $("input[name=testdrive]").val("false");
+                        $("input[name=orderbrochures]").val("false");
+                    
+                        // If the customer selected a country or dealer, the fields are set to readonly to prevent modification
+                        // After the lead has been submitted, this must be reseted, so the next customer can change the value
+                        $("#country").removeAttr("readonly");
+                        $("#dealer").removeAttr("readonly");
+                        $("#currentBrand").removeAttr("readonly");
+                        $("#selectedDealer").val("");
+
+            }
+        </script>
+    </head>
+    <body>
+        <!-- GRUNDEINSTELLUNGEN -->
+        <div data-role="page" id="startscreen" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                <h1>Marken- &amp; Kampagnenauswahl</h1>
+            </div>
+            
+            <div role="main" class="ui-content">
+                <form id="generalForm">
+                    <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: center">
+                        <input type="radio" name="brand" id="vw" value="vw" />
+                        <label for="vw"><img src="img/logos/vw.new.png" width="128px"></label>
+                        <input type="radio" name="brand" id="audi" value="audi" />
+                        <label for="audi"><img src="img/logos/audi.new.png" width="128px"></label>
+                        <input type="radio" name="brand" id="seat" value="seat" />
+                        <label for="seat"><img src="img/logos/seat.new.png" width="128px"></label>
+                        <input type="radio" name="brand" id="skoda" value="skoda" />
+                        <label for="skoda"><img src="img/logos/skoda.new.png" width="128px"></label>
+                        <input type="radio" name="brand" id="vwnf" value="vwnf">
+                        <label for="vwnf"><img src="img/logos/vwnf.new.png" width="128px"></label>
+                    </fieldset>
+                    
+                    <span id="errorbrand"></span>
+                    
+                    <div data-role="content">
+                        <div data-role="controlgroup" id="campaignselection">
+                            <!-- The campaigns from the server or the file will be loaded here -->
+                        </div>
+                        <span id="errorcampaigncode" ></span>
+                    </div>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a"><input type="text" name="collector" id="collector" value="" placeholder="Erfassende Person" autocapitalize="on" autocorrect="off"></div>
+                    </div>
+                    
+                    <span id="errorcollector" ></span>
+                    
+                    <div class="ui-grid-solo ui-responsive">
+                        <div class="ui-block-a"><a href="#vehicledata" id="continueVehicleData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Mit Auswahl fortfahren</a>
+                        </div>
+                    </div>
+            
+                    <div data-role="footer" data-position="fixed">
+                        <a href="#" id="updatevalues" class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-refresh">Modelle &amp; Kampagnen aktualisieren</a>
+                        <a href="#" id="retransmit" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-refresh ui-btn-right" style="background: #e2001a; color: white;"></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- FAHRZEUGDATEN -->
+        <div data-role="page" id="vehicledata" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                <h1 id="titelvehicledata">Fahrzeug</h1>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                <div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">
+                    <a href="#dynamicsearch" id="dynamicsearchDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-search" data-role="button" role="button"> DynamicSearch
+                    </a>
+                    <a href="#customerdata" id="continueCustomerDataShortcut" class="ui-link  ui-btn ui-shadow ui-corner-all ui-btn-icon-right ui-icon-carat-r" data-role="button" role="button"> Manuelle Eingabe
+                    </a>
+                </div>
+            </div>
+            <div role="main" class="ui-content">
+                <form id="vehicleForm">
+                    <div class="ui-grid-c">
+                    <div class="ui-block-a" style="width: 1%;"> </div>
+                        <div class="ui-block-b" style="width: 29%;">
+                            <fieldset data-role="controlgroup" data-type="horizontal">
+                                <input type="checkbox" id="testdrive" class="type" name="leadactiontyp">
+                                <label for="testdrive">Probefahrt</label>
+                                <input type="checkbox" id="orderbrochures" class="type" name="leadactiontyp">
+                                <label for="orderbrochures">Prospekte</label>
+                            </fieldset>
+                        </div>
+                        <div class="ui-block-c" style="width: 69%">
+                           <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: right">
+                                <a href="#ConfirmReset"  id="confirmresetlink" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-delete" data-rel="popup" data-position-to="window">Zurücksetzten (neuer Kunde)</a>
+                            </fieldset>
+                       </div>
+                       <div class="ui-block-d" style="width: 1%;"> </div>
+                    </div>
+                    
+                    <span id="errorleadactiontyp"></span>
+                    <span id="errorvlcoptions"></span>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 50%">
+                            <div data-role="content">
+                                <div data-role="controlgroup" id="vehicleselection">
+                                    <!-- The models from the server or the file will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-block-b" style="width: 50%">
+                            <div data-role="content">
+                                <div data-role="controlgroup" id="vehicleselectionaccessory">
+                                    <!-- The models from the server or the file will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a">
+                            <a href="#dynamicsearch"  id="continuedynamicsearch" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-search">DynamicSearch (Online)</a>
+                        </div>
+                        <div class="ui-block-b">
+                            <a href="#customerdata"  id="continueCustomerData" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Manuelle Adresseingabe</a>
+                        </div>
+                    </div>
+                    
+                        <input type="hidden" name="testdrive" value="false">
+                        <input type="hidden" name="orderbrochures" value="false">
+                    </div>
+                </form>
+                <div data-role="popup" id="ConfirmReset" data-overlay-theme="b" data-theme="b" style="width:400px;" class="ui-corner-all ui-popup ui-body-a ui-overlay-shadow">
+                    <div data-role="header" data-theme="a" class="ui-corner-top ui-header ui-bar-a" role="banner">
+                        <h1 class="ui-title" role="heading" aria-level="1">Zurücksetzten..</h1>
+                    </div>
+                    <div role="main" class="ui-corner-bottom ui-content">
+                        <h3 class="ui-title">Alle Eingaben löschen?</h3>
+                        Es werden alle Formulare geleert und kein Lead übertragen. Damit sind sie bereit für einen neuen Kunden.
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">
+                                <a href="#vehicledata" data-role="button" id="resetfornewcustomer" class="ui-btn ui-corner-all ui-btn-icon-right" role="button">Ja</a>
+                            </div>
+                            <div class="ui-block-b">
+                                <a href="#vehicledata" data-role="button" id="donoting" class="ui-btn ui-corner-all ui-btn-icon-right" role="button">Nein!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                
+            </div>
+        </div>
+        
+        <!-- INTERESSENTENDATEN -->
+        <div data-role="page" id="customerdata" data-theme="b">
+            <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                <h1 id="titelcustomerdata">Interessentendaten</h1>
+                <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                <a href="#vehicledata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button">Schritt zurück </a>
+            </div>
+            
+            <div role="main" class="ui-content">
+                <form id="customerForm">
+                   <div class="ui-grid-a">
+                       <div class="ui-block-a" style="width: 40%">
+                           <fieldset data-role="controlgroup" data-type="horizontal">
+                                <input type="radio" name="salutation" id="m" value="m">
+                                <label for="m">Herr</label>
+                                <input type="radio" name="salutation" id="f" value="f">
+                                <label for="f">Frau</label>
+                            </fieldset>
+                       </div>
+                       <div class="ui-block-b" style="width: 60%">
+                           <fieldset data-role="controlgroup" data-type="horizontal" style="text-align: right">
+                                <input type="radio" name="lang" id="de" value="de">
+                                <label for="de">Deutsch</label>
+                                <input type="radio" name="lang" id="fr" value="fr">
+                                <label for="fr">Französich</label>
+                                <input type="radio" name="lang" id="it" value="it">
+                                <label for="it">Italienisch</label>
+                                <input type="radio" name="lang" id="en" value="en">
+                                <label for="en">Englisch</label>
+                            </fieldset>
+                       
+                       </div>
+                   </div>
+                   
+                    <span id="errorsalutation" ></span>
+                    <span id="errorlang" ></span>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a"><input type="text" name="name" id="name" value="" placeholder="Vorname" autocapitalize="on" autocorrect="off"></div>
+                        <div class="ui-block-b"><input type="text" name="surname" id="surname" value="" placeholder="Nachname" autocapitalize="on" autocorrect="off"></div>
+                    </div>
+                    
+                    <span id="errorname" ></span>
+                    <span id="errorsurname" ></span>
+
+                    <div>
+                        <div><input type="text" name="company" id="company" value="" placeholder="Firma" autocapitalize="on" autocorrect="off"></div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 90%;"><input type="text" name="address" id="address" value="" placeholder="Adresse" autocapitalize="on" autocorrect="off"></div>
+                        <div class="ui-block-b" style="width: 10%;"><input type="text" name="houseNumber" id="houseNumber" value="" placeholder="Nr." autocapitalize="off" autocorrect="off"></div>
+                    </div>
+                    
+                    <span id="erroraddress" ></span>
+                    <span id="errorhouseNumber" ></span>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 20%;"><input type="number" name="zip" id="zip" value="" placeholder="PLZ" autocapitalize="off" autocorrect="off"></div>
+                        <div class="ui-block-b" style="width: 80%;"><input type="text" name="city" id="city" value="" placeholder="Ort" autocapitalize="on" autocorrect="off"></div>
+                    </div>
+                    
+                    <span id="errorzip" ></span>
+                    <span id="errorcity" ></span>
+                    
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a" style="width: 15%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Schweizer Lead:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 15%; margin-top: 2px;">
+                            <fieldset>
+                                <div data-role="field contain" style="margin:2px 0;"​>
+                                    <input type="checkbox" id="countrySwitch" data-role="flipswitch">
+                                    <input type="hidden" id="selectedCountry" name="country" />
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="ui-block-c" style="width: 70%;" id="countrySelection">
+                            <input id="country" data-type="search" autocapitalize="on" autocorrect="off">
+                            <div class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup" data-filter="true" data-input="#country" data-filter-reveal="true" data-enhanced="true" id="countries">
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AD" role="button">Andorra</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AE" role="button">Vereinigte Arabische Emirate</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AF" role="button">Afghanistan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AG" role="button">Antigua und Barbuda</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AI" role="button">Anguilla</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AL" role="button">Albanien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AM" role="button">Armenien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AN" role="button">Niederländische Antillen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AO" role="button">Angola</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AQ" role="button">Antarktis</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AR" role="button">Argentinien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AS" role="button">Amerikanisch-Samoa</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AT" role="button">Österreich</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AU" role="button">Australien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AW" role="button">Aruba</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AX" role="button">Alandinseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="AZ" role="button">Aserbaidschan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BA" role="button">Bosnien und Herzegowina</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BB" role="button">Barbados</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BD" role="button">Bangladesh</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BE" role="button">Belgien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BF" role="button">Burkina Faso</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BG" role="button">Bulgarien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BH" role="button">Bahrain</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BI" role="button">Burundi</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BJ" role="button">Benin</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BL" role="button">St. Barthélemy</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BM" role="button">Bermuda</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BN" role="button">Brunei</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BO" role="button">Bolivien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BR" role="button">Brasilien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BS" role="button">Bahamas</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BT" role="button">Bhutan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BV" role="button">Bouvetinsel</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BW" role="button">Botswana</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BY" role="button">Weissrussland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="BZ" role="button">Belize</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CA" role="button">Kanada</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CC" role="button">Kokosinseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CD" role="button">Demokratische Republik Kongo</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CF" role="button">Zentralafrikanische Republik</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CG" role="button">Kongo</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CI" role="button">Côte d’Ivoire</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CK" role="button">Cookinseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CL" role="button">Chile</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CM" role="button">Kamerun</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CN" role="button">China</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CO" role="button">Kolumbien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CR" role="button">Costa Rica</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CS" role="button">Serbien und Montenegro</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CU" role="button">Kuba</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CV" role="button">Kapverden</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CX" role="button">Weihnachtsinsel</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CY" role="button">Zypern</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="CZ" role="button">Tschechische Republik</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="DE" role="button">Deutschland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="DJ" role="button">Djibouti</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="DK" role="button">Dänemark</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="DM" role="button">Dominica</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="DO" role="button">Dominikanische Republik</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="DZ" role="button">Algerien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="EC" role="button">Ecuador</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="EE" role="button">Estland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="EG" role="button">Ägypten</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="EH" role="button">Westsahara</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ER" role="button">Eritrea</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ES" role="button">Spanien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ET" role="button">Äthiopien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="FI" role="button">Finnland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="FJ" role="button">Fidschi</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="FK" role="button">Falklandinseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="FM" role="button">Mikronesien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="FO" role="button">Färöer</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="FR" role="button">Frankreich</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GA" role="button">Gabun</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GB" role="button">Grossbritannien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GD" role="button">Grenada</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GE" role="button">Georgien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GF" role="button">Französisch-Guayana</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GG" role="button">Guernsey</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GH" role="button">Ghana</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GI" role="button">Gibraltar</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GL" role="button">Grönland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GM" role="button">Gambia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GN" role="button">Guinea</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GP" role="button">Guadeloupe</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GQ" role="button">Äquatorialguinea</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GR" role="button">Griechenland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GS" role="button">Südgeorgien und die Südlichen Sandwichinseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GT" role="button">Guatemala</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GU" role="button">Guam</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GW" role="button">Guinea-Bissau</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="GY" role="button">Guyana</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="HK" role="button">Sonderverwaltungszone Hongkong</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="HM" role="button">Heard- und McDonald-Inseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="HN" role="button">Honduras</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="HR" role="button">Kroatien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="HT" role="button">Haiti</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="HU" role="button">Ungarn</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ID" role="button">Indonesien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IE" role="button">Irland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IL" role="button">Israel</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IM" role="button">Isle of Man</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IN" role="button">Indien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IO" role="button">Britisches Territorium im Indischen Ozean</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IQ" role="button">Irak</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IR" role="button">Iran</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IS" role="button">Island</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="IT" role="button">Italien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="JE" role="button">Jersey</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="JM" role="button">Jamaika</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="JO" role="button">Jordanien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="JP" role="button">Japan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KE" role="button">Kenia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KG" role="button">Kirgisistan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KH" role="button">Kambodscha</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KI" role="button">Kiribati</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KM" role="button">Komoren</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KN" role="button">St. Kitts und Nevis</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KP" role="button">Demokratische Volksrepublik Korea</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KR" role="button">Republik Korea</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KW" role="button">Kuwait</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KY" role="button">Kaimaninseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="KZ" role="button">Kasachstan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LA" role="button">Laos</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LB" role="button">Libanon</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LC" role="button">St. Lucia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LI" role="button">Liechtenstein</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LK" role="button">Sri Lanka</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LR" role="button">Liberia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LS" role="button">Lesotho</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LT" role="button">Litauen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LU" role="button">Luxemburg</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LV" role="button">Lettland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="LY" role="button">Libyen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MA" role="button">Marokko</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MC" role="button">Monaco</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MD" role="button">Republik Moldau</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ME" role="button">Montenegro</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MF" role="button">St. Martin</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MG" role="button">Madagaskar</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MH" role="button">Marshall-Inseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MK" role="button">Mazedonien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ML" role="button">Mali</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MM" role="button">Myanmar</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MN" role="button">Mongolei</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MO" role="button">Sonderverwaltungszone Macao</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MP" role="button">Nördliche Marianen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MQ" role="button">Martinique</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MR" role="button">Mauretanien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MS" role="button">Montserrat</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MT" role="button">Malta</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MU" role="button">Mauritius</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MV" role="button">Malediven</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MW" role="button">Malawi</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MX" role="button">Mexiko</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MY" role="button">Malaysia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="MZ" role="button">Mosambik</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NA" role="button">Namibia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NC" role="button">Neukaledonien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NE" role="button">Niger</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NF" role="button">Norfolkinsel</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NG" role="button">Nigeria</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NI" role="button">Nicaragua</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NL" role="button">Niederlande</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NO" role="button">Norwegen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NP" role="button">Nepal</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NR" role="button">Nauru</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NU" role="button">Niue</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="NZ" role="button">Neuseeland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="OM" role="button">Oman</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PA" role="button">Panama</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PE" role="button">Peru</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PF" role="button">Französisch-Polynesien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PG" role="button">Papua-Neuguinea</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PH" role="button">Philippinen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PK" role="button">Pakistan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PL" role="button">Polen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PM" role="button">St. Pierre und Miquelon</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PN" role="button">Pitcairn</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PR" role="button">Puerto Rico</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PS" role="button">Palästinensische Gebiete</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PT" role="button">Portugal</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PW" role="button">Palau</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="PY" role="button">Paraguay</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="QA" role="button">Katar</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="RE" role="button">Réunion</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="RO" role="button">Rumänien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="RS" role="button">Serbien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="RU" role="button">Russische Föderation</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="RW" role="button">Rwanda</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SA" role="button">Saudi-Arabien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SB" role="button">Salomon-Inseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SC" role="button">Seychellen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SD" role="button">Sudan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SE" role="button">Schweden</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SG" role="button">Singapur</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SH" role="button">St. Helena</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SI" role="button">Slowenien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SJ" role="button">Svalbard und Jan Mayen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SK" role="button">Slowakei</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SL" role="button">Sierra Leone</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SM" role="button">San Marino</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SN" role="button">Senegal</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SO" role="button">Somalia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SR" role="button">Suriname</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ST" role="button">Sao Tomé und Principe</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SV" role="button">El Salvador</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SY" role="button">Syrien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="SZ" role="button">Swasiland</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TC" role="button">Turks- und Caicosinseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TD" role="button">Tschad</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TF" role="button">Französische Süd- und Antarktisgebiete</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TG" role="button">Togo</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TH" role="button">Thailand</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TJ" role="button">Tadschikistan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TK" role="button">Tokelau</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TL" role="button">Osttimor</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TM" role="button">Turkmenistan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TN" role="button">Tunesien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TO" role="button">Tonga</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TR" role="button">Türkei</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TT" role="button">Trinidad und Tobago</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TV" role="button">Tuvalu</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TW" role="button">Taiwan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="TZ" role="button">Tansania</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="UA" role="button">Ukraine</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="UG" role="button">Uganda</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="UM" role="button">Amerikanisch-Ozeanien</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="US" role="button">Vereinigte Staaten</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="UY" role="button">Uruguay</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="UZ" role="button">Usbekistan</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VA" role="button">Vatikanstadt</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VC" role="button">St. Vincent und die Grenadinen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VE" role="button">Venezuela</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VG" role="button">Britische Jungferninseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VI" role="button">Amerikanische Jungferninseln</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VN" role="button">Vietnam</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="VU" role="button">Vanuatu</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="WF" role="button">Wallis und Futuna</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="WS" role="button">Samoa</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="YE" role="button">Jemen</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="YT" role="button">Mayotte</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ZA" role="button">Südafrika</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ZM" role="button">Sambia</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ZW" role="button">Zimbabwe</a>
+                                <a href="#" class="countryoption ui-screen-hidden ui-link ui-btn ui-shadow ui-corner-all" data-role="button" id="ZZ" role="button">Unbekannte oder ungültige Region</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ui-grid-b">
+                        <div class="ui-block-a" style="width: 15%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Wunschpartner:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 15%;">
+                                <fieldset>
+                                    <div data-role="field contain" style="margin:2px 0;"​>
+                                        <input type="checkbox" id="dealerSwitch" data-role="flipswitch">
+                                        <input type="hidden" id="selectedDealer" name="dealer" />
+                                    </div>
+                                </fieldset>
+                        </div>
+                        <div class="ui-block-c" style="width: 70%;" id="dealerSelection">
+                            <input id="dealer" data-type="search" autocapitalize="on" autocorrect="off">
+                            <div
+                                class="ui-controlgroup ui-controlgroup-vertical ui-corner-all"
+                                data-role="controlgroup"
+                                data-filter="true"
+                                data-input="#dealer"
+                                data-filter-reveal="true"
+                                data-enhanced="true"
+                                id="dealers">
+                                    
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a">
+                            <input type="tel" name="phone" id="phone" value="" placeholder="Telefon" autocapitalize="off" autocorrect="off" />
+                        </div>
+                        <div class="ui-block-b">
+                            <input type="email" name="mail" id="mail" value="" placeholder="Email" autocapitalize="off" autocorrect="off" />
+                        </div>
+                    </div>
+                    
+                    <span id="errorphone"></span>
+                    <span id="errormail"></span>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a">
+                            <textarea rows="4" name="remarks" id="remarks" value="" placeholder="Bemerkungen" autocapitalize="on" autocorrect="off"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a">
+                            <div class="ui-field-contain">
+                                <fieldset data-role="controlgroup">
+                                    <legend><a href="#dsgpopup" data-rel="popup" style="color:black;">Datenschutzbestimmungen</a></legend>
+                                    <input type="checkbox" name="conditionsAccepted" id="conditionsAccepted" class="custom" data-mini="true" checked value="true">
+                                    <label for="conditionsAccepted">Einverstanden mit der Nutzung der personenbezogenen Daten</label>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- POPUP: Datenschutztext -->
+                    <div data-role="popup" id="dsgpopup">
+                        <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+                        <h2>Datennutzungserklärung</h2>
+                        <p>Ich bin damit einverstanden, dass meine personenbezogenen Daten zum Zwecke der Interessentenbefragung und Interessenteninformation (z.B. über Produkte, Dienstleistungen und Veranstaltungen der AMAG Automobil- und Motoren AG und ihren Marken) bearbeitet werden. Weiter bin ich damit einverstanden, dass meine Daten der AMAG Automobil- und Motoren AG, Aarauerstrasse 20, 5116 Schinznach-Bad, deren Vertragspartner und/oder an einen autorisierten Dienstleister übermittelt werden. Schliesslich bin ich damit einverstanden, dass mir die AMAG Automobil- und Motoren AG fernmeldetechnisch (z.B. per E-Mail) Informationen und Werbung zu Produkten, Dienstleistungen und Veranstaltungen ihrer Marken sendet. Die Daten werden ausschliesslich in Übereinstimmung mit den schweizerischen Bestimmungen zum Datenschutz verwendet. Insbesondere erfolgt keine Weitergabe von Daten an unbefugte Dritte.</p>
+                    </div>
+                                
+                    <div class="ui-grid-solo">
+                        <div class="ui-block-a">
+                            <input type="text" name="salesperson" id="salesperson" value="" placeholder="Verkäufer" autocapitalize="on" autocorrect="off" />
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a">
+                            <a href="#" id="submitminimumleadbutton" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-action">Absenden</a>
+                        </div>
+                        <div class="ui-block-b">
+                            <a href="#optionaldata" id="optionalinformation" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-carat-r">Optionale Angaben</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+              <!-- OPTIONALE ANGABEN -->
+            <div data-role="page" id="optionaldata" data-theme="b">
+                <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                    <h1 id="titeloptionaldata">Interessentendaten</h1>
+                    <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                    <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-carat-l" data-role="button" role="button ">Schritt zurück </a>
+                </div>
+                
+                <div role="main" class="ui-content">
+                    <form id="optionalForm">
+                                    <div class="ui-grid-b">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Angaben zur Person:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;">
+                            <input type="number" name="age" id="age" value="" placeholder="Alter" autocapitalize="off" autocorrect="off">
+                        </div>
+                        <div class="ui-block-c" style="width: 49%;">
+                            <p></p>
+                        </div>
+                    </div>
+                    
+                    <span id="errorage"></span>
+                    
+                    <div class="ui-grid-c">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Aktuelles Fahrzeug:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;" id="brandSelection">
+                            <input id="currentBrand" name="currentBrand" data-type="search" placeholder="Marke" autocapitalize="on" autocorrect="off">
+                            <div class="ui-controlgroup ui-controlgroup-vertical ui-corner-all" data-role="controlgroup" data-filter="true" data-input="#currentBrand" data-filter-reveal="true" data-enhanced="true">
+                                <div class="ui-controlgroup-controls">
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Abarth</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">AC</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Acura</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Alfa Romeo</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Allard</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Alpina</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Alpine</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Alvis</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">AMC</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Ariel</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Armstrong Siddeley</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Ascari</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Aston Martin</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Audi</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Austin</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Austin-Healey</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Autobianchi</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Auverland</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Avanti</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Beijing</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Bentley</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Berkeley</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Bitter</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Bizzarrini</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">BMW</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Brilliance</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Bristol</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Bugatti</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Buick</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Cadillac</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Caterham</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Checker</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Chevrolet</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Chrysler</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Citroen</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Dacia</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Daewoo</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">DAF</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Daihatsu</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Daimler</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Datsun</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">De Tomaso</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">DKW</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Dodge</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Donkervoort</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Eagle</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Fairthorpe</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Ferrari</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Fiat</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Fisker</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Ford</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">GAZ</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Geely</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Ginetta</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">GMC</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Holden</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Honda</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Hudson</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Humber</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Hummer</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Hyundai</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Infiniti</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Innocenti</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Isuzu</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Italdesign</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Jaguar</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Jeep</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Jensen</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Kia</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Koenigsegg</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lada</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lamborghini</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lancia</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Land Rover</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lexus</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lincoln</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lotec</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Lotus</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Luxgen</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Mahindra</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Marcos</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Maserati</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Matra-Simca</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Maybach</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Mazda</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">MCC</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">McLaren</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Mercedes-Benz</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Mercury</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">MG</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Mini</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Mitsubishi</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Monteverdi</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Moretti</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Morgan</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Morris</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Nissan</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Noble</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">NSU</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Oldsmobile</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Opel</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Packard</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Pagani</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Panoz</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Peugeot</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Pininfarina</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Plymouth</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Pontiac</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Porsche</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Proton</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Reliant</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Renault</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Riley</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Rolls-Royce</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Rover</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Saab</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Saleen</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Samsung</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Saturn</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Scion</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Seat</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Simca</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Singer</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Skoda</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Smart</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Spyker</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">SsangYong</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">SSC</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Steyr</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Studebaker</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Subaru</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Sunbeam</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Suzuki</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Talbot</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Tata</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Tatra</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Tesla</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Toyota</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Trabant</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Triumph</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">TVR</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Vauxhall</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Vector</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Venturi</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Volkswagen</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Volvo</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Wartburg</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Westfield</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Willys-Overland</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Xedos</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Zagato</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Zastava</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">ZAZ</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">Zenvo</a>
+                                    <a href="#" class="currentbrandoption ui-screen-hidden" data-role="button">ZIL</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ui-block-c" style="width: 31%;">
+                        
+                        </div>
+                        <div class="ui-block-d" style="width: 18%;" margin: 0 auto;>
+                        
+                        </div>
+                    </div>
+                
+                
+                    <div class="ui-grid-c">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;" id="makerselection">
+                             <input type="text" name="currentModel" id="currentModel" value="" placeholder="Modell" autocapitalize="on" autocorrect="off">
+                        </div>
+                        <div class="ui-block-c" style="width: 31%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-d" style="width: 18%;" margin: 0 auto;>
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-c">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-b" style="width: 31%;" id="makerselection">
+                            <select name="vehicleAge" id="vehicleAge" data-mini="true">
+                                <option value="na">Alter</option>
+                                <option value="1">1 Jahr</option>
+                                <option value="2">2 Jahre</option>
+                                <option value="3">3 Jahre</option>
+                                <option value="4">4 Jahre</option>
+                                <option value="5">5 Jahre</option>
+                                <option value="6">6 Jahre</option>
+                                <option value="7">7 Jahre</option>
+                                <option value="8">8 Jahre</option>
+                                <option value="9">9 Jahre</option>
+                                <option value="10">10 Jahre</option>
+                                <option value="10+">über 10 Jahre</option>
+                            </select>
+                        </div>
+                        <div class="ui-block-c" style="width: 31%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                        <div class="ui-block-d" style="width: 18%;" margin: 0 auto;>
+                            <p style="line-height: 53px margin:0;"></p>
+                        </div>
+                    </div>
+                
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 20%; margin: 0 auto;">
+                            <p style="line-height: 53px margin:0;">Neuanschaffung geplant:</p>
+                        </div>
+                        <div class="ui-block-b" style="width: 40%;">
+                           <div class="ui-field-contain">
+                              <fieldset data-role="controlgroup">
+                                <input type="radio" name="intendedPurchase" value="4" id="intendedpurchase-choice-1">
+                                <label for="intendedpurchase-choice-1">in den nächsten vier Monaten</label>
+                                <input type="radio" name="intendedpurchase" value="9" id="intendedpurchase-choice-2">
+                                <label for="intendedpurchase-choice-2">in den nächsten neun Monaten</label>
+                                <input type="radio" name="intendedPurchase" value="12" id="intendedpurchase-choice-3">
+                                <label for="intendedpurchase-choice-3">innert einem Jahr</label>
+                                <input type="radio" name="intendedPurchase" value="12+" id="intendedpurchase-choice-4">
+                                <label for="intendedpurchase-choice-4">später</label>
+                              </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ui-grid-a">
+                        <div class="ui-block-a" style="width: 100%">
+                            <a href="#" id="submitfulllead" class="ui-btn ui-corner-all ui-btn-icon-right ui-icon-action">Absenden</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        
+            <!-- DYNAMIC SEARCH -->
+            <div data-role="page" id="dynamicsearch" data-theme="b">
+                <div data-role="header" data-position="fixed" data-tap-toggle="false" data-theme="b">
+                    <h1 id="titeldynamicsearch">DynamicSearch</h1>
+                    <a href="#startscreen" class="ui-link ui-btn-left ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home" data-role="button" role="button">Startseite </a>
+                    <a href="#customerdata" class="ui-link ui-btn-right ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-delete" data-role="button" role="button ">Normale Eingabe</a>
+                </div>
+                
+                <div role="main" class="ui-content">
+                    <form id="dynamicsearchForm">
+                        <div class="ui-grid-c">
+                            <div class="ui-block-a" style="width: 31%;">
+                                <input type="text" name="searchName" id="searchName" value="" placeholder="Vorname" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-b" style="width: 31%;">
+                                <input type="text" name="searchSurname" id="searchSurname" value="" placeholder="Nachname" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-c" style="width: 7%; line-height: 53px; text-align:center;">
+                                <b>oder</b>
+                            </div>
+                            <div class="ui-block-d" style="width: 31%;">
+                                <input type="number" name="searchPhone" id="searchPhone" value="" placeholder="Telefon-Nr. 012 234 56 78" autocapitalize="on" autocorrect="off">
+                            </div>
+                        </div>
+                        
+                        <div class="ui-grid-c">
+                            <div class="ui-block-a" style="width: 11%;">
+                                <input type="text" name="searchZIP" id="searchZIP" value="" placeholder="PLZ" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-b" style="width: 40%;">
+                                <input type="text" name="searchCity" id="searchCity" value="" placeholder="Ort" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-c" style="width: 11%;">
+                                <input type="text" name="searchCanton" id="searchCanton" value="" placeholder="Kanton" autocapitalize="on" autocorrect="off">
+                            </div>
+                            <div class="ui-block-d" style="width: 38%; line-height: 53px; text-align:center;">
+                            <span id="dynamicinfo">Suche ab 6 Zeichen...</span><b><span id="errordynamic" class="error" style="color:red"></span></b>
+                            </div>
+                        </div>
+                 
+                        <div data-role="controlgroup" id="customerResults">
+                            <!-- Customer results will be displayed here -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+        <div data-role="page" id="Popup" data-theme="b">
+            <!-- POPUP: ERFOLGSMELDUNG -->
+            <div id="submitsuccess" data-theme="a" class="ui-content">
+                <div data-role="content">
+                    <h2>Versand erfolgreich</h2>
+                    <p>Die Daten konnten erfolgreich versendet werden.</p>
+                </div>
+            </div>
+                
+            <!-- POPUP: FEHLERMELDUNG -->
+            <div id="submitfailure" data-theme="a" class="ui-content">
+                <div data-role="content">
+                    <h2>Versand zurückgestellt (Offline)</h2>
+                    <p>Beim Versand gab es ein Problem. Die Anfrage wurde allerdings gespeichert und kann später übermittelt werden.</p>
+                </div>
+            </div>
+      </div>
+    </body>
+</html>

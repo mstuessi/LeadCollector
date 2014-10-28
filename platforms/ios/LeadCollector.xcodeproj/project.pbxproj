@@ -317,7 +317,7 @@
 				LastUpgradeCheck = 510;
 				TargetAttributes = {
 					1D6058900D05DD3D006BFB54 = {
-						DevelopmentTeam = 22888G6SBL;
+						DevelopmentTeam = ZQ7APRJQ4P;
 					};
 				};
 			};
@@ -488,7 +488,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "LaunchImage-2";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: AMAG Automobil- und Motoren AG";
 				COPY_PHASE_STRIP = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -514,7 +514,7 @@
 					"-ObjC",
 				);
 				PRODUCT_NAME = LeadCollector;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "9d6b31fc-49ae-4ec6-b201-e96190aaab05";
 				TARGETED_DEVICE_FAMILY = 2;
 				VALID_ARCHS = "armv7 armv7s";
 			};
@@ -528,7 +528,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "LaunchImage-2";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: AMAG Automobil- und Motoren AG";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LeadCollector/LeadCollector-Prefix.pch";
@@ -552,7 +552,7 @@
 					"-ObjC",
 				);
 				PRODUCT_NAME = LeadCollector;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "9d6b31fc-49ae-4ec6-b201-e96190aaab05";
 				TARGETED_DEVICE_FAMILY = 2;
 				VALID_ARCHS = "armv7 armv7s";
 			};

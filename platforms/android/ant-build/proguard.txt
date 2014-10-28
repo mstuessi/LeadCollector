@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:6
+-keep class ch.amag.webtech.leadcollector.LeadCollector { <init>(...); }
+
