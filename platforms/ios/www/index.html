@@ -279,7 +279,7 @@
                             data: {
                                 submissions: textRead
                             },
-                            url: "http://s1100pws428.amag.car.web/leadcollector/failedleadssubmission",
+                            url: "http://leadcollector.amag.ch/leadcollector/failedleadssubmission",
                             success: function(response) {
                                 saveText("", "failedsubmissions.json", function() {
                                     checkForFailedSubmissions();
@@ -327,7 +327,7 @@
                             async: false,
                             data: $("#customerForm").serialize(),
                             timeout: 3000,
-                            url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
+                            url: "http://leadcollector.amag.ch/leadcollector/leadsubmission",
                             beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                             complete: function() { $.mobile.loading( 'hide')},
                             success: function(response) {
@@ -391,7 +391,7 @@
                             async: false,
                             data: $("#optionalForm").serialize(),
                             timeout: 3000,
-                            url: "http://s1100pws428.amag.car.web/leadcollector/leadsubmission",
+                            url: "http://leadcollector.amag.ch/leadcollector/leadsubmission",
                             beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                             complete: function() { $.mobile.loading( 'hide')},
                             success: function(response) {
@@ -538,7 +538,7 @@
                                 authenticationToken: "Abcd1234"
                             },
                             timeout: 1000,
-                            url: "http://s1100pws428.amag.car.web/leadcollector/customerphonesearch",
+                            url: "http://leadcollector.amag.ch/leadcollector/customerphonesearch",
                             success: function(response) {
                                 $("#customerResults").empty();
                                 $('#errordynamic').html("");
@@ -580,7 +580,7 @@
                             type: "POST",
                             data: $("#dynamicsearchForm").serialize() + "&authenticationToken=Abcd1234",
                             timeout: 1000,
-                            url: "http://s1100pws428.amag.car.web/leadcollector/customersearch",
+                            url: "http://leadcollector.amag.ch/leadcollector/customersearch",
                             success: function(response) {
                                 $("#customerResults").empty();
                                 $('#errordynamic').html("");
@@ -718,7 +718,7 @@
                 $.ajax({
                     type: "GET",
                     dataType: "json",
-                    url: "http://s1100pws428.amag.car.web/leadcollector/campaignlist?lang=de",
+                    url: "http://leadcollector.amag.ch/leadcollector/campaignlist?lang=de",
                     timeout: 3000,
                     beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                     complete: function() { $.mobile.loading( 'hide')},
@@ -800,7 +800,7 @@
                         type: "GET",
                         dataType: "json",
                         async: false,
-                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model",
+                        url: "http://leadcollector.amag.ch/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=model",
                         timeout: 1000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
@@ -821,7 +821,7 @@
                         type: "GET",
                         dataType: "json",
                         async: false,
-                        url: "http://s1100pws428.amag.car.web/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=accessory",
+                        url: "http://leadcollector.amag.ch/leadcollector/optionlist?brand=" + currentIterationBrand + "&type=accessory",
                         timeout: 1000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
@@ -862,7 +862,7 @@
                         type: "GET",
                         async: false,
                         dataType: "json",
-                        url: "http://s1100pws428.amag.car.web/leadcollector/dealerlist?brand=" + currentIterationBrand,
+                        url: "http://leadcollector.amag.ch/leadcollector/dealerlist?brand=" + currentIterationBrand,
                         timeout: 3000,
                         beforeSend: function() { $.mobile.loading( 'show', { theme: "b", text: "", textonly: false})},
                         complete: function() { $.mobile.loading( 'hide')},
