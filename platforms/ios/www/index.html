@@ -535,7 +535,7 @@
                             type: "POST",
                             data: {
                                 searchPhone:$('#searchPhone').val(),
-                                authenticationToken: "Abcd1234"
+                                authenticationToken: "only4AMAG!"
                             },
                             timeout: 1000,
                             url: "http://leadcollector.amag.ch/leadcollector/customerphonesearch",
@@ -578,7 +578,7 @@
                         $('#dynamicinfo').html("");
                         $.ajax({
                             type: "POST",
-                            data: $("#dynamicsearchForm").serialize() + "&authenticationToken=Abcd1234",
+                            data: $("#dynamicsearchForm").serialize() + "&authenticationToken=only4AMAG!",
                             timeout: 1000,
                             url: "http://leadcollector.amag.ch/leadcollector/customersearch",
                             success: function(response) {
@@ -672,6 +672,8 @@
                         $("#it").checkboxradio("refresh");
                         $("#en").checkboxradio("refresh");
                     }
+                    
+                    $("#customerResults").empty();
                 })
 
                 // Trigger submit procedure if enter was hit
@@ -936,6 +938,7 @@
                         $("#customerForm")[0].reset();
                         $("#vehicleForm")[0].reset();
                         $("#optionalForm")[0].reset();
+                        $("#dynamicsearchForm")[0].reset();
                     
                         // The hidden inputs won't be reseted for some reason, so clear them manually
                         $("input[name=testdrive]").val("false");
@@ -1481,8 +1484,8 @@
                     <!-- POPUP: Datenschutztext -->
                     <div data-role="popup" id="dsgpopup">
                         <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-                        <h2>Datennutzungserklärung</h2>
-                        <p>Ich bin damit einverstanden, dass meine personenbezogenen Daten zum Zwecke der Interessentenbefragung und Interessenteninformation (z.B. über Produkte, Dienstleistungen und Veranstaltungen der AMAG Automobil- und Motoren AG und ihren Marken) bearbeitet werden. Weiter bin ich damit einverstanden, dass meine Daten der AMAG Automobil- und Motoren AG, Aarauerstrasse 20, 5116 Schinznach-Bad, deren Vertragspartner und/oder an einen autorisierten Dienstleister übermittelt werden. Schliesslich bin ich damit einverstanden, dass mir die AMAG Automobil- und Motoren AG fernmeldetechnisch (z.B. per E-Mail) Informationen und Werbung zu Produkten, Dienstleistungen und Veranstaltungen ihrer Marken sendet. Die Daten werden ausschliesslich in Übereinstimmung mit den schweizerischen Bestimmungen zum Datenschutz verwendet. Insbesondere erfolgt keine Weitergabe von Daten an unbefugte Dritte.</p>
+                        <h2>Datenverwendungsklausel</h2>
+                        <p>Die nachstehende Einwilligungserklärung erfolgt freiwillig und kann jederzeit widerrufen werden. Ich bin damit einverstanden, dass meine vorstehend im Rahmen des Kundenereignisses (z. B. Veranstaltung, Messe, Gewinnspiel, Interessentenbetreuung) angegebenen personenbezogenen Daten und soweit ich jeweils eingewilligt habe meine angegebene E-Mail-Adresse und Telefonnummer (einschließlich SMS), zu Zwecken der Kundenbetreuung, -befragung und persönlich auf mich zugeschnittenen Kundeninformation von der AMAG Automobil- und Motoren AG und den Gesellschaften des Volkswagen Konzerns erhoben, verarbeitet, übermittelt und genutzt werden dürfen. Einzelheiten zum Datenschutz bei der Volkswagen AG entnehmen Sie bitte den Richtlinien zur Datenerhebung, -verarbeitung, -übermittlung und -nutzung unter http://www.volkswagen.de/de/tools/navigation/footer/rechtliches/datenschutz.html</p>
                     </div>
                                 
                     <div class="ui-grid-solo">
